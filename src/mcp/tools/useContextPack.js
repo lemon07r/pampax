@@ -84,7 +84,10 @@ export function registerUseContextPackTool(server, options) {
 
     server.tool(
         'use_context_pack',
-        useContextPackInputSchema,
+        {
+            name: z.string().min(1).describe('Context pack name (e.g., "test-pack", "stripe-backend") or "clear" to reset'),
+            path: z.string().optional().describe('PROJECT ROOT directory path (defaults to ".")')
+        },
         async (params) => {
             const result = await handler(params);
             return {
