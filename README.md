@@ -5,7 +5,7 @@ This fork adds native support for any OpenAI compatible API endpoints (so use an
 **Version 1.13.x** · **Semantic Search** · **MCP Compatible** · **Node.js**
 
 <p align="center">
-  <img src="assets/pampa_banner.jpg" alt="Agent Rules Kit Logo" width="729" />
+  <img src="assets/pampax_banner.png" alt="Agent Rules Kit Logo" width="729" />
 </p>
 
 <p align="center">
