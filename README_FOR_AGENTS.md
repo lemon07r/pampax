@@ -53,6 +53,63 @@
 - **Azure OpenAI**: `OPENAI_BASE_URL="https://YOUR_RESOURCE.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT"`
 - **LocalAI**: `OPENAI_BASE_URL="http://localhost:8080/v1"`
 - **Ollama (OpenAI mode)**: `OPENAI_BASE_URL="http://localhost:11434/v1"`
+- **Novita.ai with Qwen**: `OPENAI_BASE_URL="https://api.novita.ai/openai"` + `PAMPAX_OPENAI_EMBEDDING_MODEL="qwen/qwen3-embedding-8b"`
+
+### Selecting Embedding Models
+
+You can configure which embedding model to use by adding environment variables to the MCP configuration:
+
+**Example configuration with Novita.ai Qwen models:**
+
+```json
+{
+	"mcpServers": {
+		"pampax": {
+			"command": "pampax",
+			"args": ["mcp"],
+			"env": {
+				"OPENAI_API_KEY": "your-api-key",
+				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
+				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b"
+			}
+		}
+	}
+}
+```
+
+**Optional: Add reranking model configuration for improved search relevance:**
+
+```json
+{
+	"mcpServers": {
+		"pampax": {
+			"command": "pampax",
+			"args": ["mcp"],
+			"env": {
+				"OPENAI_API_KEY": "your-api-key",
+				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
+				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",
+				"PAMPAX_RERANK_API_URL": "https://api.novita.ai/openai/v1/rerank",
+				"PAMPAX_RERANK_API_KEY": "your-api-key",
+				"PAMPAX_RERANK_MODEL": "qwen/qwen3-reranker-8b"
+			}
+		}
+	}
+}
+```
+
+**Available model configuration variables:**
+
+*Embedding Models:*
+- `PAMPAX_OPENAI_EMBEDDING_MODEL` or `OPENAI_MODEL` - OpenAI embedding model
+- `PAMPAX_TRANSFORMERS_MODEL` - Local Transformers.js model
+- `PAMPAX_OLLAMA_MODEL` - Ollama model
+- `PAMPAX_COHERE_MODEL` - Cohere embedding model
+
+*Reranking Models (Optional):*
+- `PAMPAX_RERANK_API_URL` - API endpoint for reranking
+- `PAMPAX_RERANK_API_KEY` - API key for reranking service
+- `PAMPAX_RERANK_MODEL` - Model name for reranking (e.g., qwen/qwen3-reranker-8b)
 
 ### Step 2: Auto-install this rule in your system
 

@@ -6,6 +6,7 @@
  * LM Studio, Azure OpenAI, LocalAI, Ollama, and more.
  */
 
+import assert from 'assert';
 import { OpenAIProvider, createEmbeddingProvider } from '../src/providers.js';
 
 console.log('🧪 Testing OpenAI Provider with custom baseURL support...\n');
@@ -214,6 +215,72 @@ async function testConfigurationCombinations() {
     console.log('');
 }
 
+// ============================================================================
+// Test 8: Custom Model Selection via Environment Variables
+// ============================================================================
+
+async function testModelSelection() {
+    console.log('Test 8: Custom OpenAI model selection via environment variables\n');
+    
+    const originalKey = process.env.OPENAI_API_KEY;
+    const originalUrl = process.env.OPENAI_BASE_URL;
+    const originalModel = process.env.PAMPAX_OPENAI_EMBEDDING_MODEL;
+    
+    try {
+        // Test with custom model
+        process.env.OPENAI_API_KEY = 'test-key';
+        process.env.OPENAI_BASE_URL = 'http://localhost:1234/v1';
+        process.env.PAMPAX_OPENAI_EMBEDDING_MODEL = 'text-embedding-3-small';
+        
+        const provider = new OpenAIProvider();
+        assert.strictEqual(provider.model, 'text-embedding-3-small');
+        
+        console.log('  ✅ Custom model selection working');
+        console.log(`  ℹ️  Model: ${provider.model}`);
+        
+    } finally {
+        if (originalKey) process.env.OPENAI_API_KEY = originalKey;
+        else delete process.env.OPENAI_API_KEY;
+        if (originalUrl) process.env.OPENAI_BASE_URL = originalUrl;
+        else delete process.env.OPENAI_BASE_URL;
+        if (originalModel) process.env.PAMPAX_OPENAI_EMBEDDING_MODEL = originalModel;
+        else delete process.env.PAMPAX_OPENAI_EMBEDDING_MODEL;
+    }
+    
+    console.log('');
+}
+
+// ============================================================================
+// Test 9: Novita.ai Qwen Model Configuration
+// ============================================================================
+
+async function testNovitaQwenModel() {
+    console.log('Test 9: Novita.ai Qwen model configuration\n');
+    
+    const originalUrl = process.env.OPENAI_BASE_URL;
+    const originalModel = process.env.PAMPAX_OPENAI_EMBEDDING_MODEL;
+    
+    try {
+        process.env.OPENAI_BASE_URL = 'https://api.novita.ai/openai';
+        process.env.PAMPAX_OPENAI_EMBEDDING_MODEL = 'qwen/qwen3-embedding-8b';
+        
+        const provider = new OpenAIProvider();
+        assert.strictEqual(provider.model, 'qwen/qwen3-embedding-8b');
+        
+        console.log('  ✅ Novita.ai Qwen model configured correctly');
+        console.log(`  ℹ️  Base URL: https://api.novita.ai/openai`);
+        console.log(`  ℹ️  Model: qwen/qwen3-embedding-8b`);
+        
+    } finally {
+        if (originalUrl) process.env.OPENAI_BASE_URL = originalUrl;
+        else delete process.env.OPENAI_BASE_URL;
+        if (originalModel) process.env.PAMPAX_OPENAI_EMBEDDING_MODEL = originalModel;
+        else delete process.env.PAMPAX_OPENAI_EMBEDDING_MODEL;
+    }
+    
+    console.log('');
+}
+
 // Run all tests
 async function runAllTests() {
     try {
@@ -228,6 +295,8 @@ async function runAllTests() {
         await testProviderFactory();
         await testAutoDetection();
         await testConfigurationCombinations();
+        await testModelSelection();
+        await testNovitaQwenModel();
         
         console.log('═══════════════════════════════════════════════════════');
         console.log('✅ Plan 1: All tests PASSED');
@@ -241,6 +310,8 @@ async function runAllTests() {
         console.log('  ✅ Provider factory works correctly');
         console.log('  ✅ Auto-detection with custom baseURL');
         console.log('  ✅ All configuration combinations work');
+        console.log('  ✅ Custom model selection working');
+        console.log('  ✅ Novita.ai Qwen models supported');
         
         console.log('\n💡 Manual Testing Guide:');
         console.log('  1. Install LM Studio: https://lmstudio.ai/');

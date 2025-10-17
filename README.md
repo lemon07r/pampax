@@ -393,6 +393,49 @@ Then index with the OpenAI provider:
 pampax index --provider openai
 ```
 
+### Selecting Embedding Models
+
+You can configure which embedding model to use via environment variables:
+
+**OpenAI Provider:**
+```bash
+# Use a specific OpenAI model
+export PAMPAX_OPENAI_EMBEDDING_MODEL="text-embedding-3-small"  # Cheaper, faster
+# or
+export OPENAI_MODEL="text-embedding-3-large"  # Alternative env var
+
+# Default: text-embedding-3-large
+```
+
+**Other Providers:**
+```bash
+# Transformers.js (local)
+export PAMPAX_TRANSFORMERS_MODEL="Xenova/all-mpnet-base-v2"
+# Default: Xenova/all-MiniLM-L6-v2
+
+# Ollama
+export PAMPAX_OLLAMA_MODEL="llama2"
+# Default: nomic-embed-text
+
+# Cohere
+export PAMPAX_COHERE_MODEL="embed-multilingual-v3.0"
+# Default: embed-english-v3.0
+```
+
+**Example with Novita.ai Qwen Models:**
+```bash
+# Configure Novita.ai with Qwen embedding model
+export OPENAI_BASE_URL="https://api.novita.ai/openai"
+export OPENAI_API_KEY="your-novita-api-key"
+export PAMPAX_OPENAI_EMBEDDING_MODEL="qwen/qwen3-embedding-8b"
+
+# Index with this configuration
+pampax index --provider openai
+
+# Search will use the Qwen embedding model
+pampax search "authentication logic" --provider openai
+```
+
 **Supported Services:**
 - ✅ llama.cpp
 - ✅ Kobold.cpp
@@ -442,6 +485,24 @@ export PAMPAX_RERANK_MODEL="rerank-english-v3.0"
 export PAMPAX_RERANK_API_URL="https://api.jina.ai/v1/rerank"
 export PAMPAX_RERANK_API_KEY="your-jina-api-key"
 export PAMPAX_RERANK_MODEL="jina-reranker-v2-base-multilingual"
+```
+
+**Example with Novita.ai Qwen Reranker:**
+```bash
+export PAMPAX_RERANK_API_URL="https://api.novita.ai/openai/v1/rerank"
+export PAMPAX_RERANK_API_KEY="your-novita-api-key"
+export PAMPAX_RERANK_MODEL="qwen/qwen3-reranker-8b"
+
+# Use together with Qwen embedding for full pipeline
+export OPENAI_BASE_URL="https://api.novita.ai/openai"
+export OPENAI_API_KEY="your-novita-api-key"
+export PAMPAX_OPENAI_EMBEDDING_MODEL="qwen/qwen3-embedding-8b"
+
+# Index with Qwen embeddings
+pampax index --provider openai
+
+# Search with both Qwen embedding and reranking
+pampax search "authentication logic" --provider openai --reranker api
 ```
 
 **MCP Integration:**

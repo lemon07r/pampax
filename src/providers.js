@@ -42,7 +42,11 @@ export class OpenAIProvider extends EmbeddingProvider {
         super();
         // Dynamic import to avoid error if not installed
         this.openai = null;
-        this.model = 'text-embedding-3-large';
+        // Support model selection via environment variables
+        // Priority: PAMPAX_OPENAI_EMBEDDING_MODEL > OPENAI_MODEL > default
+        this.model = process.env.PAMPAX_OPENAI_EMBEDDING_MODEL 
+                     || process.env.OPENAI_MODEL 
+                     || 'text-embedding-3-large';
     }
 
     async init() {
@@ -92,7 +96,9 @@ export class TransformersProvider extends EmbeddingProvider {
     constructor() {
         super();
         this.pipeline = null;
-        this.model = 'Xenova/all-MiniLM-L6-v2';
+        // Support model selection via environment variable
+        this.model = process.env.PAMPAX_TRANSFORMERS_MODEL 
+                     || 'Xenova/all-MiniLM-L6-v2';
         this.initialized = false;
     }
 
@@ -133,7 +139,7 @@ export class TransformersProvider extends EmbeddingProvider {
 // ============================================================================
 
 export class OllamaProvider extends EmbeddingProvider {
-    constructor(model = 'nomic-embed-text') {
+    constructor(model = process.env.PAMPAX_OLLAMA_MODEL || 'nomic-embed-text') {
         super();
         this.model = model;
         this.ollama = null;
@@ -176,7 +182,9 @@ export class CohereProvider extends EmbeddingProvider {
     constructor() {
         super();
         this.cohere = null;
-        this.model = 'embed-english-v3.0';
+        // Support model selection via environment variable
+        this.model = process.env.PAMPAX_COHERE_MODEL 
+                     || 'embed-english-v3.0';
     }
 
     async init() {
