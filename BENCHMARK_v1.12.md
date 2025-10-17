@@ -132,6 +132,71 @@ Benchmark results
 -   **Normalized DCG**: 93.4% relevance quality
 -   **Response Time**: ~1-2 seconds (pre-indexed)
 
+### Running Custom Benchmarks
+
+You can run benchmarks with different configurations to test various reranking strategies:
+
+**Basic benchmark (default scenarios):**
+```bash
+npm run bench
+# Runs: Base, Hybrid, Hybrid+CE (local transformers reranker)
+```
+
+**Custom reranker configuration:**
+```bash
+# Use specific reranker mode
+npm run bench -- --reranker=api
+npm run bench -- --reranker=transformers
+npm run bench -- --reranker=off
+
+# Test specific scenarios
+npm run bench -- --modes=hybrid,hybrid-ce
+npm run bench -- --modes=base
+```
+
+**Using API-based rerankers (Novita.ai, Cohere, Jina):**
+```bash
+# Configure API reranker environment variables
+export PAMPAX_RERANK_API_URL="https://api.novita.ai/openai/v1/rerank"
+export PAMPAX_RERANK_API_KEY="your-api-key"
+export PAMPAX_RERANK_MODEL="qwen/qwen3-reranker-8b"
+
+# Run benchmark with API reranker
+npm run bench -- --reranker=api --modes=hybrid-ce
+
+# Or use environment variable
+export PAMPA_BENCH_RERANKER=api
+npm run bench
+```
+
+**Available configuration options:**
+
+*Command-line arguments:*
+- `--reranker=<mode>` - Reranker mode: `off`, `transformers`, `api`
+- `--modes=<list>` - Comma-separated scenarios: `base`, `hybrid`, `hybrid-ce`
+- `--hybrid=<bool>` - Enable/disable hybrid search: `true`, `false`
+- `--bm25=<bool>` - Enable/disable BM25: `true`, `false`
+
+*Environment variables:*
+- `PAMPA_BENCH_RERANKER` - Default reranker mode
+- `PAMPA_BENCH_MODES` - Default scenarios to run
+- `PAMPA_BENCH_HYBRID` - Default hybrid setting
+- `PAMPA_BENCH_BM25` - Default BM25 setting
+
+*API Reranker configuration (used when --reranker=api):*
+- `PAMPAX_RERANK_API_URL` - Reranking API endpoint
+- `PAMPAX_RERANK_API_KEY` - API authentication key
+- `PAMPAX_RERANK_MODEL` - Model name (e.g., `qwen/qwen3-reranker-8b`)
+- `PAMPAX_RERANKER_MAX` - Max candidates to rerank (default: 50)
+
+**Example: Benchmark with Cohere Rerank:**
+```bash
+export PAMPAX_RERANK_API_URL="https://api.cohere.ai/v1/rerank"
+export PAMPAX_RERANK_API_KEY="your-cohere-key"
+export PAMPAX_RERANK_MODEL="rerank-english-v3.0"
+npm run bench -- --reranker=api
+```
+
 ### Comparison Considerations
 
 **PAMPA Advantages:**

@@ -545,6 +545,25 @@ PAMPAX v1.12 uses a specialized architecture for semantic code search with measu
 | Hybrid+CE  | 1.000 | 0.958 | 0.967   |
 ```
 
+**Run benchmarks yourself:**
+
+```bash
+# Run default benchmarks (Base, Hybrid, Hybrid+CE)
+npm run bench
+
+# Test with API reranker (Novita.ai, Cohere, Jina)
+export PAMPAX_RERANK_API_URL="https://api.novita.ai/openai/v1/rerank"
+export PAMPAX_RERANK_API_KEY="your-api-key"
+export PAMPAX_RERANK_MODEL="qwen/qwen3-reranker-8b"
+npm run bench -- --reranker=api
+
+# Custom configurations
+npm run bench -- --modes=hybrid,hybrid-ce
+npm run bench -- --reranker=transformers
+```
+
+See [BENCHMARK_v1.12.md](BENCHMARK_v1.12.md) for detailed configuration options.
+
 ### 🎯 Search Examples
 
 ```bash
