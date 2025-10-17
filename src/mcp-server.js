@@ -1064,18 +1064,18 @@ async function main() {
             transport: 'stdio',
             debugMode: true
         });
-        console.log('🐛 DEBUG MODE ENABLED - Detailed logging active');
-        console.log(`📝 Debug log: ${errorLogger.debugLogPath}`);
-        console.log(`❌ Error log: ${errorLogger.errorLogPath}`);
+        console.error('🐛 DEBUG MODE ENABLED - Detailed logging active');
+        console.error(`📝 Debug log: ${errorLogger.debugLogPath}`);
+        console.error(`❌ Error log: ${errorLogger.errorLogPath}`);
     }
 
-    console.log({
-        "start": "PAMPA MCP Server started and ready for connections",
+    // Log startup to stderr to avoid interfering with MCP protocol on stdout
+    console.error(JSON.stringify({
+        "start": "PAMPAX MCP Server started and ready for connections",
         "version": packageJson.version,
         "debug_mode": debugMode
-    });
-    // Only output valid JSON for MCP protocol
-    // Debug info is logged to pampa_debug.log instead
+    }));
+    // stdout is reserved for MCP JSON-RPC protocol messages only
 }
 
 // Handle uncaught errors
