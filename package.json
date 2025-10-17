@@ -1,6 +1,6 @@
 {
 	"name": "pampax",
-	"version": "1.12.2",
+	"version": "1.12.3",
 	"description": "PAMPAX – Protocol for Augmented Memory of Project Artifacts Extended (MCP compatible)",
 	"author": "Manuel Bruña",
 	"type": "module",
