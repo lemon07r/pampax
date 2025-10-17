@@ -2,7 +2,7 @@
 	"name": "pampax",
 	"version": "1.13.0",
 	"description": "PAMPAX – Protocol for Augmented Memory of Project Artifacts Extended (MCP compatible)",
-	"author": "Manuel Bruña",
+	"author": "Lamim",
 	"type": "module",
 	"license": "ISC",
 	"repository": {
