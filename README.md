@@ -1,6 +1,6 @@
 # PAMPAX – Protocol for Augmented Memory of Project Artifacts Extended
 
-This fork adds native support for any OpenAI compatible API endpoints (so use any provider, or local api like llama.cpp server/lmstudio/etc), and support for any Reranking models instead of only supporting the previous local-only Transform.js implementation. The benchmark shows a significant improvment in performance when using a better reranking model, see below in the performance metrics section of the readme. I had only meant to make these modifications but also found some bugs on the way, so this fork also incorporates some bugfixes. Not everything is tested, but I did the best I could and fixed what I found during actual use (since this is a tool I'm using myself). See the changelog.md for a list of all the changes made or the release summary here: https://github.com/lemon07r/pampax/blob/master/RELEASE_SUMMARY_v1.13.md
+**Enhanced fork** with native support for OpenAI-compatible APIs (OpenAI, LM Studio, llama.cpp, Azure, Novita.ai, etc.) and flexible reranking models (local Transformers.js or remote APIs). Performance benchmarks show significant improvements with advanced reranking—perfect scores with Qwen3-Reranker-8B. This fork also includes important bug fixes discovered during active use. For detailed changes, see [CHANGELOG.md](CHANGELOG.md) or [RELEASE_SUMMARY_v1.13.md](RELEASE_SUMMARY_v1.13.md).
 
 **Version 1.13.x** · **Semantic Search** · **MCP Compatible** · **Node.js**
 
@@ -9,13 +9,14 @@ This fork adds native support for any OpenAI compatible API endpoints (so use an
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/npm/v/pampax.svg" alt="Version" />
   <img src="https://img.shields.io/github/license/lemon07r/pampax" alt="License" />
   <img src="https://img.shields.io/github/last-commit/lemon07r/pampax" alt="Last Commit" />
 </p>
 
 Give your AI agents an always-updated, queryable memory of any codebase – with **intelligent semantic search** and **automatic learning** – in one `npx` command.
 
-> 🇪🇸 **[Versión en Español](README_es.md)** | 🇺🇸 **English Version** | 🤖 **[Agent Version](README_FOR_AGENTS.md)**
+> 🇺🇸 **English Version** | 🇪🇸  **[Versión en Español](README_es.md)** | 🤖 **[Agent Version](README_FOR_AGENTS.md)**
 
 ## 🌟 What's New in v1.13 - Advanced Search & Multi-Project Support
 
