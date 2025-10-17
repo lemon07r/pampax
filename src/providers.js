@@ -48,7 +48,21 @@ export class OpenAIProvider extends EmbeddingProvider {
     async init() {
         if (!this.openai) {
             const { OpenAI } = await import('openai');
-            this.openai = new OpenAI();
+            
+            // Build configuration object
+            const config = {};
+            
+            // Support custom API key (explicit or from environment)
+            if (process.env.OPENAI_API_KEY) {
+                config.apiKey = process.env.OPENAI_API_KEY;
+            }
+            
+            // Support custom base URL for OpenAI-compatible APIs
+            if (process.env.OPENAI_BASE_URL) {
+                config.baseURL = process.env.OPENAI_BASE_URL;
+            }
+            
+            this.openai = new OpenAI(config);
         }
     }
 

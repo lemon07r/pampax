@@ -360,9 +360,45 @@ PAMPA supports multiple providers for generating code embeddings:
 | **Transformers.js** | 🟢 Free                  | 🟢 Total | `npm install @xenova/transformers`                         |
 | **Ollama**          | 🟢 Free                  | 🟢 Total | [Install Ollama](https://ollama.ai) + `npm install ollama` |
 | **OpenAI**          | 🔴 ~$0.10/1000 functions | 🔴 None  | Set `OPENAI_API_KEY`                                       |
+| **OpenAI-Compatible** | 🟡 Varies              | 🟡 Varies | Set `OPENAI_API_KEY` + `OPENAI_BASE_URL`                  |
 | **Cohere**          | 🟡 ~$0.05/1000 functions | 🔴 None  | Set `COHERE_API_KEY` + `npm install cohere-ai`             |
 
 **Recommendation:** Use **Transformers.js** for personal development (free and private) or **OpenAI** for maximum quality.
+
+### Using OpenAI-Compatible APIs
+
+PAMPA supports any OpenAI-compatible API endpoint through environment variables:
+
+```bash
+# LM Studio (local)
+export OPENAI_BASE_URL="http://localhost:1234/v1"
+export OPENAI_API_KEY="lm-studio"  # Can be any value for local servers
+
+# Azure OpenAI
+export OPENAI_BASE_URL="https://YOUR_RESOURCE.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT"
+export OPENAI_API_KEY="your-azure-api-key"
+
+# LocalAI
+export OPENAI_BASE_URL="http://localhost:8080/v1"
+export OPENAI_API_KEY="not-needed"
+
+# Ollama with OpenAI compatibility
+export OPENAI_BASE_URL="http://localhost:11434/v1"
+export OPENAI_API_KEY="ollama"
+```
+
+Then index with the OpenAI provider:
+```bash
+npx pampa index --provider openai
+```
+
+**Supported Services:**
+- ✅ llama.cpp
+- ✅ Kobold.cpp
+- ✅ LM Studio
+- ✅ Azure OpenAI
+- ✅ Ollama (with OpenAI compatibility)
+- ✅ Any OpenAI-compatible API gateway or proxy
 
 ## 🏆 Performance Analysis
 

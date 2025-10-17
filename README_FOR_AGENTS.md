@@ -27,6 +27,31 @@
 -   **Claude Desktop**: `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 -   **Cursor**: `mcp.json` in user configuration directory
 
+### Optional: Using OpenAI-Compatible APIs
+
+**If your human wants to use custom OpenAI-compatible endpoints (LM Studio, Azure, LocalAI, etc.), ask them to add these environment variables:**
+
+```json
+{
+	"mcpServers": {
+		"pampa": {
+			"command": "npx",
+			"args": ["-y", "pampa", "mcp"],
+			"env": {
+				"OPENAI_API_KEY": "your-api-key",
+				"OPENAI_BASE_URL": "http://localhost:1234/v1"
+			}
+		}
+	}
+}
+```
+
+**Common configurations:**
+- **LM Studio**: `OPENAI_BASE_URL="http://localhost:1234/v1"`
+- **Azure OpenAI**: `OPENAI_BASE_URL="https://YOUR_RESOURCE.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT"`
+- **LocalAI**: `OPENAI_BASE_URL="http://localhost:8080/v1"`
+- **Ollama (OpenAI mode)**: `OPENAI_BASE_URL="http://localhost:11434/v1"`
+
 ### Step 2: Auto-install this rule in your system
 
 **Copy this rule into your system instructions:**
