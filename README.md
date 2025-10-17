@@ -166,14 +166,16 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 {
 	"mcpServers": {
 		"pampax": {
-			"command": "npx",
-			"args": ["-y", "pampax", "mcp"]
+			"command": "pampax",
+			"args": ["mcp"]
 		}
 	}
 }
 ```
 
-**Optional**: Add `"--debug"` to args for detailed logging: `["-y", "pampax", "mcp", "--debug"]`
+**Note**: After installing from GitHub with `npm install -g git+https://github.com/lemon07r/pampax.git`, the `pampax` command will be available globally.
+
+**Optional**: Add `"--debug"` to args for detailed logging: `["mcp", "--debug"]`
 
 #### Cursor
 
@@ -224,39 +226,39 @@ For direct terminal usage or manual project indexing:
 ### Install the CLI
 
 ```bash
-# Run without installing
-npx pampax --help
-
-# Or install globally from GitHub (requires Node.js 20+)
+# Install globally from GitHub (requires Node.js 20+)
 npm install -g git+https://github.com/lemon07r/pampax.git
+
+# Verify installation
+pampax --help
 ```
 
 ### Index or update a project
 
 ```bash
 # Index current repository with the best available provider
-npx pampax index
+pampax index
 
 # Force the local CPU embedding model (no API keys required)
-npx pampax index --provider transformers
+pampax index --provider transformers
 
 # Re-embed after code changes
-npx pampax update
+pampax update
 
 # Inspect indexed stats at any time
-npx pampax info
+pampax info
 ```
 
 > Indexing writes `.pampax/` (SQLite database + chunk store) and `pampax.codemap.json`. Commit the codemap to git so teammates and CI re-use the same metadata.
 
 | Command                                  | Purpose                                                  |
 | ---------------------------------------- | -------------------------------------------------------- | ----- | ------------------------------------------------- |
-| `npx pampax index [path] [--provider X]`  | Create or refresh the full index at the provided path    |
-| `npx pampax update [path] [--provider X]` | Force a full re-scan (helpful after large refactors)     |
-| `npx pampax watch [path] [--provider X]`  | Incrementally update the index as files change           |
-| `npx pampax search <query>`               | Hybrid BM25 + vector search with optional scoped filters |
-| `npx pampax context <list                 | show                                                     | use>` | Manage reusable context packs for search defaults |
-| `npx pampax mcp`                          | Start the MCP stdio server for editor/agent integrations |
+| `pampax index [path] [--provider X]`  | Create or refresh the full index at the provided path    |
+| `pampax update [path] [--provider X]` | Force a full re-scan (helpful after large refactors)     |
+| `pampax watch [path] [--provider X]`  | Incrementally update the index as files change           |
+| `pampax search <query>`               | Hybrid BM25 + vector search with optional scoped filters |
+| `pampax context <list                 | show                                                     | use>` | Manage reusable context packs for search defaults |
+| `pampax mcp`                          | Start the MCP stdio server for editor/agent integrations |
 
 ### Search with scoped filters & ranking flags
 
@@ -275,16 +277,16 @@ npx pampax info
 
 ```bash
 # Narrow to service files tagged stripe in PHP
-npx pampax search "create checkout session" --path_glob "app/Services/**" --tags stripe --lang php
+pampax search "create checkout session" --path_glob "app/Services/**" --tags stripe --lang php
 
 # Use OpenAI embeddings but keep hybrid fusion enabled
-npx pampax search "payment intent status" --provider openai --hybrid on --bm25 on
+pampax search "payment intent status" --provider openai --hybrid on --bm25 on
 
 # Reorder top candidates locally
-npx pampax search "oauth middleware" --reranker transformers --limit 5
+pampax search "oauth middleware" --reranker transformers --limit 5
 
 # Disable signature boosts for literal keyword hunts
-npx pampax search "token validation" --symbol_boost off
+pampax search "token validation" --symbol_boost off
 ```
 
 > PAMPAX extracts function signatures and lightweight call graphs with tree-sitter. When symbol boosts are enabled, queries that mention a specific method, class, or a directly connected helper will receive an extra scoring bump.
@@ -310,16 +312,16 @@ Store JSON packs in `.pampax/contextpacks/*.json` to capture reusable defaults:
 
 ```bash
 # List packs and highlight the active one
-npx pampax context list
+pampax context list
 
 # Inspect the full JSON definition
-npx pampax context show stripe-backend
+pampax context show stripe-backend
 
 # Activate scoped defaults (flags still win if provided explicitly)
-npx pampax context use stripe-backend
+pampax context use stripe-backend
 
 # Clear the active pack (use "none" or "clear")
-npx pampax context use clear
+pampax context use clear
 ```
 
 **MCP tip:** The MCP tool `use_context_pack` mirrors the CLI. Agents can switch packs mid-session and every subsequent `search_code` call inherits those defaults until cleared.
@@ -328,7 +330,7 @@ npx pampax context use clear
 
 ```bash
 # Watch the repository with a 750 ms debounce and local embeddings
-npx pampax watch --provider transformers --debounce 750
+pampax watch --provider transformers --debounce 750
 ```
 
 The watcher batches filesystem events, reuses the Merkle hash store in `.pampax/merkle.json`, and only re-embeds touched files. Press `Ctrl+C` to stop.
@@ -388,7 +390,7 @@ export OPENAI_API_KEY="ollama"
 
 Then index with the OpenAI provider:
 ```bash
-npx pampax index --provider openai
+pampax index --provider openai
 ```
 
 **Supported Services:**
@@ -417,10 +419,10 @@ export PAMPAX_RERANK_API_KEY="your-api-key"
 export PAMPAX_RERANK_MODEL="rerank-v3.5"  # Optional, model to use
 
 # Search with API reranker
-npx pampax search "authentication logic" --reranker api
+pampax search "authentication logic" --reranker api
 
 # Or use in CLI
-npx pampax search "payment processing" --reranker api --limit 5
+pampax search "payment processing" --reranker api --limit 5
 ```
 
 **Reranker Options:**
@@ -652,7 +654,7 @@ PAMPAX can encrypt chunk bodies at rest using AES-256-GCM. Configure it like thi
 2. Index with encryption enabled (skips plaintext writes even if stale files exist):
 
     ```bash
-    npx pampax index --encrypt on
+    pampax index --encrypt on
     ```
 
     Without `--encrypt`, PAMPAX auto-encrypts when the environment key is present. Use `--encrypt off` to force plaintext (e.g., for debugging).
@@ -664,7 +666,7 @@ Existing plaintext archives remain readable, so you can enable encryption increm
 ## 🤝 Contributing
 
 1. **Fork** → create feature branch (`feat/...`)
-2. **Run** `npm test` (coming soon) & `npx pampax index` before PR
+2. **Run** `npm test` (coming soon) & `pampax index` before PR
 3. **Open PR** with context: why + screenshots/logs
 
 All discussions on GitHub Issues.

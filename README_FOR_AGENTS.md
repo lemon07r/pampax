@@ -12,8 +12,8 @@
 {
 	"mcpServers": {
 		"pampax": {
-			"command": "npx",
-			"args": ["-y", "pampax", "mcp"],
+			"command": "pampax",
+			"args": ["mcp"],
 			"env": {
 				"OPENAI_API_KEY": "optional-but-recommended"
 			}
@@ -21,6 +21,8 @@
 	}
 }
 ```
+
+**Note**: After installing from GitHub with `npm install -g git+https://github.com/lemon07r/pampax.git`, the `pampax` command will be available globally.
 
 **Configuration locations:**
 
@@ -35,8 +37,8 @@
 {
 	"mcpServers": {
 		"pampax": {
-			"command": "npx",
-			"args": ["-y", "pampax", "mcp"],
+			"command": "pampax",
+			"args": ["mcp"],
 			"env": {
 				"OPENAI_API_KEY": "your-api-key",
 				"OPENAI_BASE_URL": "http://localhost:1234/v1"
