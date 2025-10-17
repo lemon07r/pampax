@@ -931,24 +931,34 @@ export async function indexProject({
                 continue;
             }
 
-            // Tree-sitter has known issues with large files (>50KB)
+            // Tree-sitter proper handling for large files using callback-based API
             // See: https://github.com/tree-sitter/tree-sitter/issues/3473
-            // Skip parsing and use fallback for files that may cause "Invalid argument" errors
+            // https://github.com/tree-sitter/node-tree-sitter/blob/master/README.md#parse-from-custom-data-structure
+            const SIZE_THRESHOLD = 30000; // 30KB - use callback API for files larger than this
+            const CHUNK_SIZE = 30000; // Parse in 30KB chunks
+            
             let tree;
             try {
                 parser.setLanguage(rule.ts);
-                tree = parser.parse(source);
+                
+                // Use callback-based parse for large files to avoid "Invalid argument" errors
+                if (source.length > SIZE_THRESHOLD) {
+                    tree = parser.parse((index, position) => {
+                        if (index < source.length) {
+                            return source.slice(index, Math.min(index + CHUNK_SIZE, source.length));
+                        }
+                        return null;
+                    });
+                } else {
+                    tree = parser.parse(source);
+                }
                 
                 // Validate tree
                 if (!tree || !tree.rootNode) {
                     throw new Error('Failed to create syntax tree');
                 }
             } catch (parseError) {
-                // Tree-sitter parse() can throw "Invalid argument" for various reasons:
-                // - Large files (>50KB seems to be problematic)
-                // - Complex syntax structures
-                // - Parser state issues
-                // Fall through to the error handler which will index the file as a whole
+                // Genuine parse errors (not size-related)
                 throw parseError;
             }
 
