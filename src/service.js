@@ -939,7 +939,10 @@ export async function indexProject({
                     await yieldChunk(node);
                 }
                 for (let i = 0; i < node.childCount; i++) {
-                    await walk(node.child(i));
+                    const child = node.child(i);
+                    if (child) {
+                        await walk(child);
+                    }
                 }
             }
 
@@ -951,7 +954,7 @@ export async function indexProject({
                         // Look for first identifier after 'function'
                         for (let i = 0; i < node.childCount; i++) {
                             const child = node.child(i);
-                            if (child.type === 'identifier') {
+                            if (child && child.type === 'identifier') {
                                 return source.slice(child.startIndex, child.endIndex);
                             }
                         }
@@ -986,7 +989,7 @@ export async function indexProject({
                         // Look for class name
                         for (let i = 0; i < node.childCount; i++) {
                             const child = node.child(i);
-                            if (child.type === 'identifier' || child.type === 'type_identifier' || child.type === 'name') {
+                            if (child && (child.type === 'identifier' || child.type === 'type_identifier' || child.type === 'name')) {
                                 const text = source.slice(child.startIndex, child.endIndex);
                                 // Skip keyword 'class'
                                 if (text !== 'class') {

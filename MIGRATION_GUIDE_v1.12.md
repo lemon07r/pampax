@@ -134,7 +134,7 @@ pampa search "function" --directory /path/to/project
 
 ### For AI Agents
 
-1. **Update your MCP configuration** with the latest PAMPA:
+1. **Update your MCP configuration** with the latest PAMPAX:
 
 ```json
 {
@@ -161,7 +161,7 @@ search_code("authentication", { lang: ["php"], path_glob: ["app/**"] })
 
 ### For Developers
 
-1. **Reinstall PAMPA**:
+1. **Reinstall PAMPAX**:
 
 ```bash
 npm uninstall -g pampa

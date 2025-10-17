@@ -1,19 +1,19 @@
-# 🏆 PAMPA v1.12 Performance Analysis
+# 🏆 PAMPAX v1.13 Performance Analysis
 
 ## 📊 Overview
 
-This document analyzes PAMPA v1.12's semantic search capabilities and compares architectural approaches with general-purpose IDE semantic search tools.
+This document analyzes PAMPAX v1.13's semantic search capabilities and compares architectural approaches with general-purpose IDE semantic search tools.
 
 **Test Environment:**
 
--   **PAMPA Version**: v1.12.0
+-   **PAMPAX Version**: v1.13.0
 -   **Test Project**: Medium-scale web application (~680 indexed functions)
 -   **Test Date**: September 25, 2025
 -   **Languages**: PHP, TypeScript, JavaScript
 
 ## 🎯 Architectural Comparison
 
-### PAMPA v1.12 Approach
+### PAMPAX v1.13 Approach
 
 **Specialized Code Search Engine:**
 
@@ -44,7 +44,7 @@ Common code search scenarios tested:
 
 ## 📈 Performance Analysis
 
-### PAMPA v1.12 Results
+### PAMPAX v1.13 Results
 
 **Strengths:**
 
@@ -74,12 +74,12 @@ pampa search "create checkout session"
 
 **Trade-offs:**
 
--   ⚡ **PAMPA**: Faster, specialized, requires setup
+-   ⚡ **PAMPAX**: Faster, specialized, requires setup
 -   🔄 **IDE**: Integrated, general-purpose, no setup required
 
 ## 🔬 Technical Architecture Analysis
 
-### PAMPA v1.12 Specialized Features
+### PAMPAX v1.13 Specialized Features
 
 **🎯 Scoped Search Filters:**
 
@@ -112,7 +112,7 @@ pampa search "payment processing" --project /path/to/project-b
 
 ## 📊 Performance Metrics
 
-### PAMPA v1.12 Measured Performance
+### PAMPAX v1.13 Measured Performance
 
 **Synthetic Benchmark Results (Default Configuration):**
 
@@ -235,7 +235,7 @@ npm run bench -- --reranker=api
 
 ### Comparison Considerations
 
-**PAMPA Advantages:**
+**PAMPAX Advantages:**
 
 -   ✅ Specialized for code search with persistent indexing
 -   ✅ Advanced ranking algorithms (BM25 + Vector + Cross-encoder)
@@ -251,7 +251,7 @@ npm run bench -- --reranker=api
 
 ## 🔬 Technical Architecture
 
-### PAMPA v1.12 Stack
+### PAMPAX v1.13 Stack
 
 ```
 🏗️ Specialized Code Search Engine:
@@ -267,25 +267,25 @@ npm run bench -- --reranker=api
 
 **1. Indexing Strategy:**
 
--   **PAMPA**: Persistent, function-level granularity
+-   **PAMPAX**: Persistent, function-level granularity
 -   **General IDE**: On-demand, file-level processing
 
 **2. Search Algorithms:**
 
--   **PAMPA**: Multi-modal (keyword + semantic + reranking)
+-   **PAMPAX**: Multi-modal (keyword + semantic + reranking)
 -   **General IDE**: Primary semantic similarity
 
 **3. Code Understanding:**
 
--   **PAMPA**: AST parsing, symbol extraction, signature matching
+-   **PAMPAX**: AST parsing, symbol extraction, signature matching
 -   **General IDE**: Text-based semantic analysis
 
 **4. Specialization:**
 
--   **PAMPA**: Purpose-built for code search workflows
+-   **PAMPAX**: Purpose-built for code search workflows
 -   **General IDE**: General-purpose text search with semantic layer
 
-## 📈 PAMPA v1.12 New Features
+## 📈 PAMPAX v1.13 New Features
 
 ### 🎯 Scoped Search
 
@@ -309,7 +309,7 @@ Reusable search profiles for domain-specific code discovery.
 
 ## 🎯 Use Case Recommendations
 
-**Choose PAMPA when:**
+**Choose PAMPAX when:**
 
 -   Working with large, complex codebases
 -   Need specialized code search features
@@ -325,7 +325,7 @@ Reusable search profiles for domain-specific code discovery.
 
 ## 🏆 Conclusion
 
-PAMPA v1.12 represents a specialized approach to code search, optimized for developer productivity through advanced indexing, hybrid algorithms, and code-aware features. While general-purpose IDE tools excel at integration and simplicity, PAMPA fills the gap for teams requiring sophisticated semantic code discovery capabilities.
+PAMPAX v1.13 represents a specialized approach to code search, optimized for developer productivity through advanced indexing, hybrid algorithms, and code-aware features. While general-purpose IDE tools excel at integration and simplicity, PAMPA fills the gap for teams requiring sophisticated semantic code discovery capabilities.
 
 ---
 

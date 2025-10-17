@@ -1,6 +1,6 @@
-# PAMPA MCP Usage Rule
+# PAMPAX MCP Usage Rule
 
-You have access to PAMPA, a code memory system that indexes and allows semantic search in projects.
+You have access to PAMPAX, a code memory system that indexes and allows semantic search in projects.
 
 ## Basic Instructions
 
@@ -29,4 +29,4 @@ You have access to PAMPA, a code memory system that indexes and allows semantic 
 
 ## Strategy
 
-Use PAMPA as your project memory. Search before creating, keep updated after changes, and leverage existing knowledge to avoid code duplication.
+Use PAMPAX as your project memory. Search before creating, keep updated after changes, and leverage existing knowledge to avoid code duplication.

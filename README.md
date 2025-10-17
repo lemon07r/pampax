@@ -1,8 +1,8 @@
 # PAMPAX – Protocol for Augmented Memory of Project Artifacts Extended
 
-This fork adds native support for any OpenAI compatible API endpoints (so use any provider, or local api like llama.cpp server/lmstudio/etc), and support for any Reranking models instead of only supporting the previous local-only Transform.js implementation. The benchmark shows a significant improvment in performance when using a better reranking model, see below in the performance metrics section of the readme.
+This fork adds native support for any OpenAI compatible API endpoints (so use any provider, or local api like llama.cpp server/lmstudio/etc), and support for any Reranking models instead of only supporting the previous local-only Transform.js implementation. The benchmark shows a significant improvment in performance when using a better reranking model, see below in the performance metrics section of the readme. I had only meant to make these modifications but also found some bugs on the way, so this fork also incorporates some bugfixes. Not everything is tested, but I did the best I could and fixed what I found. See the changelog.md for a list of all the changes made. 
 
-**Version 1.12.x** · **Semantic Search** · **MCP Compatible** · **Node.js**
+**Version 1.13.x** · **Semantic Search** · **MCP Compatible** · **Node.js**
 
 <p align="center">
   <img src="assets/pampa_banner.jpg" alt="Agent Rules Kit Logo" width="729" />
@@ -17,7 +17,7 @@ Give your AI agents an always-updated, queryable memory of any codebase – with
 
 > 🇪🇸 **[Versión en Español](README_es.md)** | 🇺🇸 **English Version** | 🤖 **[Agent Version](README_FOR_AGENTS.md)**
 
-## 🌟 What's New in v1.12 - Advanced Search & Multi-Project Support
+## 🌟 What's New in v1.13 - Advanced Search & Multi-Project Support
 
 🎯 **Scoped Search Filters** - Filter by `path_glob`, `tags`, `lang` for precise results
 
@@ -218,7 +218,7 @@ Configure Cursor by creating or editing the `mcp.json` file in your configuratio
 
 **Additionally, install this rule in your application so it uses PAMPAX effectively:**
 
-Copy the content from [RULE_FOR_PAMPA_MCP.md](RULE_FOR_PAMPA_MCP.md) into your agent or AI system instructions.
+Copy the content from [RULE_FOR_PAMPAX_MCP.md](RULE_FOR_PAMPAX_MCP.md) into your agent or AI system instructions.
 
 ### 4. Ready! Your agent can now search code
 
@@ -531,7 +531,7 @@ When API reranking is configured, the MCP `search_code` tool automatically uses 
 
 ## 🏆 Performance Analysis
 
-PAMPAX v1.12 uses a specialized architecture for semantic code search with measurable results.
+PAMPAX v1.13 uses a specialized architecture for semantic code search with measurable results.
 
 ### 📊 Performance Metrics
 

@@ -427,7 +427,7 @@ graph TD
 **Before PAMPAX**: "Where's the database connection code?"
 **With PAMPAX**: "search_code('database connection') → Found in 2 seconds"
 
-## 🆕 New in v1.12: Advanced Features
+## 🆕 New in v1.12+: Advanced Features
 
 ### 🎯 Scoped Search Examples
 
@@ -478,7 +478,7 @@ search_code('refund transaction'); // → Only Stripe refund logic
 
 -   **Human-readable docs**: [README.md](README.md)
 -   **Spanish docs**: [README_es.md](README_es.md)
--   **MCP rule file**: [RULE_FOR_PAMPA_MCP.md](RULE_FOR_PAMPA_MCP.md)
+-   **MCP rule file**: [RULE_FOR_PAMPAX_MCP.md](RULE_FOR_PAMPAX_MCP.md)
 -   **🆕 Migration guide**: [MIGRATION_GUIDE_v1.12.md](MIGRATION_GUIDE_v1.12.md)
 -   **🆕 Multi-project demo**: [DEMO_MULTI_PROJECT.md](DEMO_MULTI_PROJECT.md)
 -   **Project repository**: https://github.com/lemon07r/pampax

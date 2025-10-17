@@ -139,7 +139,7 @@ Configura Cursor creando o editando el archivo `mcp.json` en tu directorio de co
 
 **Además, instala esta regla en tu aplicación para que use PAMPA efectivamente:**
 
-Copia el contenido de [RULE_FOR_PAMPA_MCP.md](RULE_FOR_PAMPA_MCP.md) (en inglés para mejor compatibilidad) en las instrucciones de tu agente o sistema de IA.
+Copia el contenido de [RULE_FOR_PAMPAX_MCP.md](RULE_FOR_PAMPAX_MCP.md) (en inglés para mejor compatibilidad) en las instrucciones de tu agente o sistema de IA.
 
 ### 4. ¡Listo! Tu agente ahora puede buscar código
 
@@ -249,7 +249,7 @@ Ver [PROVEEDORES_EMBEDDINGS.md](./PROVEEDORES_EMBEDDINGS.md) para detalles compl
 
 ## 🏆 Análisis de Rendimiento
 
-PAMPA v1.12 utiliza una arquitectura especializada para búsqueda semántica de código con resultados medibles.
+PAMPAX v1.12 utiliza una arquitectura especializada para búsqueda semántica de código con resultados medibles.
 
 ### 📊 Métricas de Rendimiento
 

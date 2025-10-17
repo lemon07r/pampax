@@ -28,12 +28,12 @@ let sessionContextPack = null;
 class ErrorLogger {
     constructor(workingPath = '.') {
         this.workingPath = workingPath;
-        this.debugLogPath = path.join(workingPath, 'pampa_debug.log');
-        this.errorLogPath = path.join(workingPath, 'pampa_error.log');
+        this.debugLogPath = path.join(workingPath, 'pampax_debug.log');
+        this.errorLogPath = path.join(workingPath, 'pampax_error.log');
         this.ensureLogDirectory();
 
         if (debugMode) {
-            this.debugLog('PAMPA MCP Server initialized', {
+            this.debugLog('PAMPAX MCP Server initialized', {
                 version: packageJson.version,
                 workingPath: path.resolve(workingPath),
                 serverCwd: process.cwd(),
@@ -44,8 +44,8 @@ class ErrorLogger {
 
     updateWorkingPath(newPath) {
         this.workingPath = newPath;
-        this.debugLogPath = path.join(newPath, 'pampa_debug.log');
-        this.errorLogPath = path.join(newPath, 'pampa_error.log');
+        this.debugLogPath = path.join(newPath, 'pampax_debug.log');
+        this.errorLogPath = path.join(newPath, 'pampax_error.log');
         this.ensureLogDirectory();
 
         if (debugMode) {
@@ -174,7 +174,7 @@ async function safeAsyncCall(asyncFn, context = {}) {
 }
 
 /**
- * MCP Server for PAMPA - Protocol for Augmented Memory of Project Artifacts
+ * MCP Server for PAMPAX - Protocol for Augmented Memory of Project Artifacts eXtended
  * 
  * This server exposes tools and resources for AI agents to:
  * - Search code semantically in the project
@@ -185,7 +185,7 @@ async function safeAsyncCall(asyncFn, context = {}) {
 
 // Create MCP server
 const server = new McpServer({
-    name: "pampa-code-memory",
+    name: "pampax-code-memory",
     version: packageJson.version
 });
 
@@ -208,7 +208,7 @@ registerUseContextPackTool(server, {
  * Tool for semantic code search
  * 
  * IMPORTANT: This tool searches in the database located at `{path}/.pampa/pampa.db`
- * The path parameter specifies the project directory where PAMPA has been indexed.
+ * The path parameter specifies the project directory where PAMPAX has been indexed.
  * Make sure to run index_project on that directory first.
  */
 server.tool(
@@ -217,7 +217,7 @@ server.tool(
         query: z.string().min(2, "Query cannot be empty").describe("Semantic search query (e.g. 'authentication function', 'error handling')"),
         limit: z.number().optional().default(10).describe("Maximum number of results to return"),
         provider: z.string().optional().default("auto").describe("Embedding provider (auto|openai|transformers|ollama|cohere)"),
-        path: z.string().optional().default(".").describe("PROJECT ROOT directory path where PAMPA database is located (the directory containing .pampa/ folder)"),
+        path: z.string().optional().default(".").describe("PROJECT ROOT directory path where PAMPAX database is located (the directory containing .pampa/ folder)"),
         path_glob: z.union([z.string(), z.array(z.string())]).optional().describe("Optional glob pattern(s) to limit search scope"),
         tags: z.union([z.array(z.string()), z.string()]).optional().describe("Optional list of tags to filter results"),
         lang: z.union([z.array(z.string()), z.string()]).optional().describe("Optional list of languages to filter results"),
@@ -454,7 +454,7 @@ server.tool(
     "get_code_chunk",
     {
         sha: z.string().min(1, "SHA cannot be empty").describe("SHA of the code chunk to retrieve (obtained from search_code results)"),
-        path: z.string().optional().default(".").describe("PROJECT ROOT directory path where PAMPA chunks are stored (same path used in search_code)")
+        path: z.string().optional().default(".").describe("PROJECT ROOT directory path where PAMPAX chunks are stored (same path used in search_code)")
     },
     async ({ sha, path: workingPath }) => {
         const context = { sha, workingPath, timestamp: new Date().toISOString() };
@@ -533,10 +533,40 @@ server.tool(
                 });
             }
 
+            // Limit chunk size to prevent MCP protocol crashes (max ~100KB)
+            const MAX_CHUNK_SIZE = 100000;
+            const codeText = result.code;
+            
+            if (codeText.length > MAX_CHUNK_SIZE) {
+                const truncated = codeText.substring(0, MAX_CHUNK_SIZE);
+                const lines = truncated.split('\n');
+                const lineCount = lines.length;
+                const totalLines = codeText.split('\n').length;
+                
+                return {
+                    content: [{
+                        type: "text",
+                        text: `⚠️ CODE CHUNK TOO LARGE - TRUNCATED\n\n` +
+                            `SHA: ${cleanSha}\n` +
+                            `Full size: ${codeText.length} characters (${totalLines} lines)\n` +
+                            `Showing: ${MAX_CHUNK_SIZE} characters (${lineCount} lines)\n` +
+                            `File location: ${cleanPath}/.pampa/chunks/${cleanSha}.gz\n\n` +
+                            `${'='.repeat(80)}\n\n` +
+                            truncated +
+                            `\n\n${'='.repeat(80)}\n\n` +
+                            `[TRUNCATED - ${codeText.length - MAX_CHUNK_SIZE} characters omitted]\n\n` +
+                            `To view the full file:\n` +
+                            `1. Decompress: gunzip -c ${cleanPath}/.pampa/chunks/${cleanSha}.gz\n` +
+                            `2. Or search for a more specific code segment\n`
+                    }],
+                    isError: false
+                };
+            }
+
             return {
                 content: [{
                     type: "text",
-                    text: result.code
+                    text: codeText
                 }],
                 isError: false
             };
@@ -567,7 +597,7 @@ server.tool(
 /**
  * Tool to index a project
  * 
- * IMPORTANT: This tool creates a PAMPA database at `{path}/.pampa/pampa.db`
+ * IMPORTANT: This tool creates a PAMPAX database at `{path}/.pampa/pampa.db`
  * It scans all source code files in the specified directory and creates:
  * - .pampa/pampa.db (SQLite database with embeddings)
  * - .pampa/chunks/ (compressed code chunks)
@@ -698,7 +728,7 @@ server.tool(
 server.tool(
     "get_project_stats",
     {
-        path: z.string().optional().default(".").describe("PROJECT ROOT directory path where PAMPA database is located (same path used in index_project)")
+        path: z.string().optional().default(".").describe("PROJECT ROOT directory path where PAMPAX database is located (same path used in index_project)")
     },
     async ({ path: projectPath }) => {
         const context = { projectPath, timestamp: new Date().toISOString() };
@@ -796,7 +826,7 @@ server.tool(
 /**
  * Tool to update a project index
  * 
- * IMPORTANT: This tool updates the PAMPA database at `{path}/.pampa/pampa.db`
+ * IMPORTANT: This tool updates the PAMPAX database at `{path}/.pampa/pampa.db`
  * Run this after making code changes to keep your AI agent's memory current.
  * It re-scans all files and updates embeddings for changed functions.
  * 
@@ -967,7 +997,7 @@ server.resource(
             return {
                 contents: [{
                     uri: uri.href,
-                    text: `Error loading code map: ${error.message}\n\nError logged to pampa_error.log`
+                    text: `Error loading code map: ${error.message}\n\nError logged to pampax_error.log`
                 }]
             };
         }
@@ -994,7 +1024,7 @@ server.resource(
 
             return `Project overview (${results.results.length} main functions):\n\n${overview}`;
         } catch (error) {
-            errorLogger.log(error, { resource: 'pampa://overview' });
+            errorLogger.log(error, { resource: 'pampax://overview' });
             return `Error getting overview: ${error.message}`;
         }
     }

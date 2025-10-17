@@ -1,3 +1,161 @@
+# [1.13.0](https://github.com/lemon07r/pampax/releases/tag/v1.13.0) (2024-10-17)
+
+## 🎉 PAMPAX Fork - Major Release with Critical Fixes & Enhancements
+
+This release marks the fork from the original PAMPA project (tecnomanu/pampa v1.12.2) to **PAMPAX** (lemon07r/pampax) with significant improvements, critical bug fixes, and new features developed since forked.
+
+---
+
+### ✨ New Features
+
+-   **providers:** 🌐 **OpenAI-Compatible API Support** ([6a136d0](https://github.com/lemon07r/pampax/commit/6a136d0))
+    -   Support for any OpenAI-compatible embedding API via `OPENAI_BASE_URL`
+    -   Enables use of alternative providers (Novita.ai, Together.ai, etc.)
+    -   Custom model selection via `PAMPAX_OPENAI_EMBEDDING_MODEL`
+    -   Full compatibility with local LLM servers (LM Studio, Ollama with OpenAI adapter)
+
+-   **reranking:** 🎯 **Multiple Reranker Model Support** ([9204e45](https://github.com/lemon07r/pampax/commit/9204e45))
+    -   API-based reranking via `PAMPAX_RERANK_API_URL`
+    -   Support for Novita.ai Qwen3-Reranker-8B (achieves 100% benchmark scores)
+    -   Support for Cohere Rerank, Jina Reranker, and other API endpoints
+    -   Configurable via environment variables: `PAMPAX_RERANK_API_KEY`, `PAMPAX_RERANK_MODEL`
+    -   Comprehensive tests for API reranker functionality
+
+-   **embedding:** 🧠 **Custom Embedding Model Selection** ([3b52944](https://github.com/lemon07r/pampax/commit/3b52944))
+    -   Environment variable `PAMPAX_OPENAI_EMBEDDING_MODEL` for model override
+    -   Tested with Novita.ai Qwen3-Embedding-8B
+    -   Support for any embedding model dimension size
+    -   Documentation for model configuration
+
+-   **benchmark:** 📊 **Synthetic Benchmark Results** ([4b29a9c](https://github.com/lemon07r/pampax/commit/4b29a9c), [1fee4d4](https://github.com/lemon07r/pampax/commit/1fee4d4))
+    -   Added performance benchmarks with Qwen3 models
+    -   Documented P@1, MRR@5, nDCG@10 metrics
+    -   Qwen3-Reranker-8B achieves perfect 100% scores across all metrics
+    -   Comprehensive benchmarking documentation
+
+-   **rebrand:** 🎨 **Complete Rebrand from PAMPA to PAMPAX** ([dd0a134](https://github.com/lemon07r/pampax/commit/dd0a134), [1981dcd](https://github.com/lemon07r/pampax/commit/1981dcd), [2b3aed2](https://github.com/lemon07r/pampax/commit/2b3aed2))
+    -   Updated all user-facing references from PAMPA to PAMPAX
+    -   Changed MCP server name to `pampax-code-memory`
+    -   Updated log file names: `pampax_debug.log` and `pampax_error.log`
+    -   Renamed `RULE_FOR_PAMPA_MCP.md` → `RULE_FOR_PAMPAX_MCP.md`
+    -   Updated documentation: README.md, README_FOR_AGENTS.md, README_es.md
+    -   **Maintained backward compatibility**: All file system paths (`.pampa/`, `pampa.db`, etc.) unchanged
+
+---
+
+### 🐛 Critical Bug Fixes
+
+-   **mcp:** 🐛 **Fix MCP stdio protocol corruption** ([9ccaa0c](https://github.com/lemon07r/pampax/commit/9ccaa0c), [4612c19](https://github.com/lemon07r/pampax/commit/4612c19))
+    -   Moved startup logs to stderr to prevent JSON-RPC protocol corruption
+    -   Fixed Factory Droid CLI and other MCP clients hanging on startup
+    -   Ensures stdout is reserved exclusively for MCP protocol messages
+    -   Released as v1.12.3 hotfix (now incorporated into v1.13.0)
+
+-   **mcp:** 🐛 **Fix `use_context_pack` MCP tool schema registration** ([bb92ac0](https://github.com/lemon07r/pampax/commit/bb92ac0))
+    -   Changed from Zod object schema to plain object with Zod types
+    -   Tool now properly exposes `name` and `path` parameters to MCP clients
+    -   Fixes "Context pack name must be a non-empty string" error
+    -   Context packs now fully functional in MCP environments
+
+-   **mcp:** 🐛 **Fix `get_code_chunk` crash with large code chunks**
+    -   Added 100KB size limit to prevent MCP protocol crashes
+    -   Large chunks now gracefully truncated with helpful instructions
+    -   Prevents Factory Droid CLI and other MCP clients from crashing
+    -   Provides file location and decompression instructions for full content
+    -   Critical fix for production stability
+
+-   **indexer:** 🐛 **Fix "Invalid argument" error in tree-sitter parsing**
+    -   Added null checks for all `node.child()` calls in AST traversal
+    -   Prevents crashes when tree-sitter returns null children
+    -   Improves stability during `update_project` operations
+    -   More robust error handling for malformed/incomplete syntax trees
+    -   Eliminates random parsing errors
+
+---
+
+### 📚 Documentation
+
+-   **docs:** 📝 **Comprehensive Documentation Updates** ([c2c11a2](https://github.com/lemon07r/pampax/commit/c2c11a2), [72a959b](https://github.com/lemon07r/pampax/commit/72a959b))
+    -   Added OpenAI-compatible API provider documentation
+    -   Documented custom embedding model configuration
+    -   Added API reranker setup instructions
+    -   Updated benchmarking documentation with Qwen3 results
+    -   Created `CHANGES_PAMPA_TO_PAMPAX.md` with detailed migration info
+    -   Updated `MCP_TOOL_TEST_RESULTS.md` with comprehensive tool testing
+    -   Updated `BENCHMARK_v1.12.md` → `BENCHMARK_v1.13.md`
+    -   All version references updated from v1.12 to v1.13
+
+---
+
+### 🔧 Package & Build Updates
+
+-   **package:** 📦 **Package Updates for PAMPAX**
+    -   Updated files array with new documentation names
+    -   Version bumped from 1.12.3 to 1.13.0
+    -   Repository updated to lemon07r/pampax
+    -   NPM package name: `pampax`
+    -   Prepared for npm publication
+
+---
+
+### 🎯 Performance Improvements
+
+-   **Qwen3 Integration:** Achieved **100% perfect scores** on all benchmark metrics (P@1, MRR@5, nDCG@10) using Novita.ai's Qwen3-Embedding-8B + Qwen3-Reranker-8B
+-   **Crash Resilience:** Eliminated MCP client crashes from large chunks and protocol corruption
+-   **Parsing Stability:** Robust tree-sitter parsing handles edge cases without failures
+
+---
+
+### 💥 Breaking Changes
+
+**None** - All changes are fully backward compatible with existing indexed projects:
+- Existing `.pampa/` directories work without modification
+- Database schema unchanged
+- File paths unchanged
+- MCP tool signatures unchanged (only internal improvements)
+
+---
+
+### 🔄 Migration from PAMPA to PAMPAX
+
+**No migration required!** 
+
+1. Update your MCP configuration to use `pampax` instead of `pampa`
+2. Existing `.pampa/` directories and databases continue to work unchanged
+3. Optional: Set environment variables for new features (OpenAI-compatible APIs, custom models, API rerankers)
+4. The rebranding is cosmetic - all functionality is enhanced, not changed
+
+**Example MCP Configuration Update:**
+```json
+{
+  "mcpServers": {
+    "pampax": {  // ← changed from "pampa"
+      "command": "npx",
+      "args": ["pampax-mcp"],  // ← changed from "pampa-mcp"
+      "env": {
+        "OPENAI_API_KEY": "your-key",
+        "OPENAI_BASE_URL": "https://api.novita.ai/openai",  // ← optional: custom provider
+        "PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",  // ← optional: custom model
+        "PAMPAX_RERANK_API_URL": "https://api.novita.ai/openai/v1/rerank",  // ← optional: API reranker
+        "PAMPAX_RERANK_API_KEY": "your-key",
+        "PAMPAX_RERANK_MODEL": "qwen/qwen3-reranker-8b"
+      }
+    }
+  }
+}
+```
+
+---
+
+### 🙏 Credits
+
+This fork includes contributions and improvements built upon the excellent foundation of [PAMPA by tecnomanu](https://github.com/tecnomanu/pampa). Special thanks to the original author and contributors.
+
+**Fork Maintained By:** [@lemon07r](https://github.com/lemon07r)  
+**Original Project:** [tecnomanu/pampa](https://github.com/tecnomanu/pampa)
+
+---
+
 ## [1.12.2](https://github.com/tecnomanu/pampa/compare/v1.12.1...v1.12.2) (2025-09-25)
 
 
