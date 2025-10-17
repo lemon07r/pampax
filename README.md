@@ -32,7 +32,7 @@ Give your AI agents an always-updated, queryable memory of any codebase – with
 
 🛠️ **Multi-Project CLI** - `--project` and `--directory` aliases for clarity
 
-🏆 **[Performance Analysis](BENCHMARK_v1.12.md)** - Architectural comparison with general-purpose IDE tools
+🏆 **[Performance Analysis](BENCHMARK_v1.13.md)** - Architectural comparison with general-purpose IDE tools
 
 **Major improvements:**
 
