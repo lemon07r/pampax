@@ -1,3 +1,5 @@
+import { rerankWithAPI, isAPIRerankingConfigured } from './apiReranker.js';
+
 const DEFAULT_MODEL_ID = process.env.PAMPA_RERANKER_MODEL || 'Xenova/ms-marco-MiniLM-L-6-v2';
 const DEFAULT_MAX_CANDIDATES = Number.parseInt(process.env.PAMPA_RERANKER_MAX || '50', 10);
 
@@ -6,6 +8,7 @@ let modelPromise = null;
 let loadFailed = false;
 let testRerankOverride = null;
 let testForceLoadFailure = false;
+let forceRerankMode = null; // For testing: 'api', 'local', or null for auto
 
 function shouldMock() {
     return process.env.PAMPA_MOCK_RERANKER_TESTS === '1';
@@ -161,6 +164,15 @@ function setCandidateRanks(sortedCandidates) {
     });
 }
 
+/**
+ * Main reranking function with automatic routing
+ * Routes to API-based or local Transformers.js reranker
+ * 
+ * @param {string} query - The search query
+ * @param {Array} candidates - Array of candidate objects
+ * @param {Object} options - Reranking options
+ * @returns {Promise<Array>} Reranked candidates
+ */
 export async function rerankCrossEncoder(query, candidates, options = {}) {
     if (!Array.isArray(candidates) || candidates.length <= 1) {
         return candidates;
@@ -175,6 +187,27 @@ export async function rerankCrossEncoder(query, candidates, options = {}) {
         } catch (error) {
             return candidates;
         }
+    }
+
+    // Route to API reranker if configured (unless forced to local mode)
+    const useAPI = forceRerankMode === 'api' || 
+                   (forceRerankMode !== 'local' && isAPIRerankingConfigured());
+    
+    if (useAPI) {
+        return await rerankWithAPI(query, candidates, options);
+    }
+
+    // Otherwise use local Transformers.js reranker
+    return await rerankCrossEncoderLocal(query, candidates, options);
+}
+
+/**
+ * Local Transformers.js reranking implementation
+ * (Original rerankCrossEncoder logic)
+ */
+async function rerankCrossEncoderLocal(query, candidates, options = {}) {
+    if (!Array.isArray(candidates) || candidates.length <= 1) {
+        return candidates;
     }
 
     const maxCandidates = Math.min(coerceMaxCandidates(options.max), candidates.length);
@@ -244,6 +277,7 @@ export function __resetForTests() {
     loadFailed = false;
     testRerankOverride = null;
     testForceLoadFailure = false;
+    forceRerankMode = null;
 }
 
 export function __setTestRerankOverride(override) {
@@ -252,5 +286,9 @@ export function __setTestRerankOverride(override) {
 
 export function __setTestForceLoadFailure(force) {
     testForceLoadFailure = Boolean(force);
+}
+
+export function __setForceRerankMode(mode) {
+    forceRerankMode = mode === 'api' || mode === 'local' ? mode : null;
 }
 

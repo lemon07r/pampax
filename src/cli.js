@@ -129,11 +129,11 @@ program
     .option('--path_glob <pattern...>', 'limit results to files matching the provided glob pattern(s)')
     .option('--tags <tag...>', 'filter results to chunks tagged with the provided values')
     .option('--lang <language...>', 'filter results to the specified languages (e.g. php, ts)')
-    .option('--reranker <mode>', 'reranker strategy (off|transformers)', 'off')
+    .option('--reranker <mode>', 'reranker strategy (off|transformers|api)', 'off')
     .option('--hybrid <mode>', 'toggle reciprocal-rank-fused hybrid search (on|off)', 'on')
     .option('--bm25 <mode>', 'toggle BM25 keyword candidate generation (on|off)', 'on')
     .option('--symbol_boost <mode>', 'toggle symbol-aware ranking boost (on|off)', 'on')
-    .addHelpText('after', `\nExamples:\n  $ pampa search "create checkout session" --path_glob "app/Services/**" --tags stripe --lang php\n  $ pampa search "payment intent status" --provider openai --reranker transformers\n  $ pampa search "token validation" --symbol_boost off\n  $ pampa search "user authentication" --project /path/to/project\n  $ pampa search "database connection" --directory ~/my-laravel-app\n`)
+    .addHelpText('after', `\nExamples:\n  $ pampa search "create checkout session" --path_glob "app/Services/**" --tags stripe --lang php\n  $ pampa search "payment intent status" --provider openai --reranker transformers\n  $ pampa search "token validation" --symbol_boost off --reranker api\n  $ pampa search "user authentication" --project /path/to/project\n  $ pampa search "database connection" --directory ~/my-laravel-app\n`)
     .action(async (query, projectPath = '.', options) => {
         try {
             // Resolve project path from various options

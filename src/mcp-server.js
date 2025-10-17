@@ -221,7 +221,7 @@ server.tool(
         path_glob: z.union([z.string(), z.array(z.string())]).optional().describe("Optional glob pattern(s) to limit search scope"),
         tags: z.union([z.array(z.string()), z.string()]).optional().describe("Optional list of tags to filter results"),
         lang: z.union([z.array(z.string()), z.string()]).optional().describe("Optional list of languages to filter results"),
-        reranker: z.enum(['off', 'transformers']).optional().default('off').describe("Optional reranker strategy flag"),
+        reranker: z.enum(['off', 'transformers', 'api']).optional().default('off').describe("Optional reranker strategy flag (off|transformers|api)"),
         hybrid: z.enum(['on', 'off']).optional().default('on').describe("Enable hybrid semantic + keyword fusion"),
         bm25: z.enum(['on', 'off']).optional().default('on').describe("Enable BM25 keyword retrieval stage"),
         symbol_boost: z.enum(['on', 'off']).optional().default('on').describe("Enable symbol-aware ranking boost")

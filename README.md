@@ -1,4 +1,6 @@
-# PAMPA – Protocol for Augmented Memory of Project Artifacts
+# PAMPAX – Protocol for Augmented Memory of Project Artifacts Extended
+
+This fork adds native support for any OpenAI compatible API endpoints (so use any provider), and support for any Reranking models instead of only supporting the previous local-only Transform.js implementation. This should open up better performing model options both for emebedding and reranking.
 
 **Version 1.12.x** · **Semantic Search** · **MCP Compatible** · **Node.js**
 
@@ -399,6 +401,52 @@ npx pampa index --provider openai
 - ✅ Azure OpenAI
 - ✅ Ollama (with OpenAI compatibility)
 - ✅ Any OpenAI-compatible API gateway or proxy
+
+### Using API-Based Reranking
+
+PAMPA supports API-based reranking as an alternative to the local Transformers.js cross-encoder. This allows you to use remote reranking services for improved search precision.
+
+**Supported Reranking APIs:**
+- ✅ Cohere Rerank API
+- ✅ Jina AI Reranker
+- ✅ Voyage AI Rerank
+- ✅ Any compatible reranking API
+
+**Configuration:**
+```bash
+# Set reranking API credentials
+export PAMPA_RERANK_API_URL="https://api.cohere.ai/v1"
+export PAMPA_RERANK_API_KEY="your-api-key"
+export PAMPA_RERANK_MODEL="rerank-v3.5"  # Optional, model to use
+
+# Search with API reranker
+npx pampa search "authentication logic" --reranker api
+
+# Or use in CLI
+npx pampa search "payment processing" --reranker api --limit 5
+```
+
+**Reranker Options:**
+- `--reranker off` - No reranking (fastest, lower precision)
+- `--reranker transformers` - Local Transformers.js reranking (free, private)
+- `--reranker api` - API-based reranking (requires API key, higher precision)
+
+**Example with Cohere:**
+```bash
+export PAMPA_RERANK_API_URL="https://api.cohere.ai/v1/rerank"
+export PAMPA_RERANK_API_KEY="your-cohere-api-key"
+export PAMPA_RERANK_MODEL="rerank-english-v3.0"
+```
+
+**Example with Jina AI:**
+```bash
+export PAMPA_RERANK_API_URL="https://api.jina.ai/v1/rerank"
+export PAMPA_RERANK_API_KEY="your-jina-api-key"
+export PAMPA_RERANK_MODEL="jina-reranker-v2-base-multilingual"
+```
+
+**MCP Integration:**
+When API reranking is configured, the MCP `search_code` tool automatically uses it when `reranker: "api"` is specified.
 
 ## 🏆 Performance Analysis
 
