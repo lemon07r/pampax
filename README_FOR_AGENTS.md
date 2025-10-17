@@ -1,6 +1,6 @@
-# 🤖 PAMPA for AI Agents – Complete Setup & Usage Guide
+# 🤖 PAMPAX for AI Agents – Complete Setup & Usage Guide
 
-**If you're an AI agent reading this, you can set up PAMPA automatically and use it as your project memory!**
+**If you're an AI agent reading this, you can set up PAMPAX automatically and use it as your project memory!**
 
 ## 🚀 Auto-Setup Instructions
 
@@ -11,9 +11,9 @@
 ```json
 {
 	"mcpServers": {
-		"pampa": {
+		"pampax": {
 			"command": "npx",
-			"args": ["-y", "pampa", "mcp"],
+			"args": ["-y", "pampax", "mcp"],
 			"env": {
 				"OPENAI_API_KEY": "optional-but-recommended"
 			}
@@ -34,9 +34,9 @@
 ```json
 {
 	"mcpServers": {
-		"pampa": {
+		"pampax": {
 			"command": "npx",
-			"args": ["-y", "pampa", "mcp"],
+			"args": ["-y", "pampax", "mcp"],
 			"env": {
 				"OPENAI_API_KEY": "your-api-key",
 				"OPENAI_BASE_URL": "http://localhost:1234/v1"
@@ -57,9 +57,9 @@
 **Copy this rule into your system instructions:**
 
 ```markdown
-# PAMPA MCP Usage Rule
+# PAMPAX MCP Usage Rule
 
-You have access to PAMPA, a code memory system that indexes and allows semantic search in projects.
+You have access to PAMPAX, a code memory system that indexes and allows semantic search in projects.
 
 ## Basic Instructions
 
@@ -89,7 +89,7 @@ You have access to PAMPA, a code memory system that indexes and allows semantic 
 
 ## Strategy
 
-Use PAMPA as your project memory. Search before creating, keep updated after changes, and leverage existing knowledge to avoid code duplication.
+Use PAMPAX as your project memory. Search before creating, keep updated after changes, and leverage existing knowledge to avoid code duplication.
 ```
 
 ## 🧠 Essential Workflow for AI Agents
@@ -207,7 +207,7 @@ graph TD
 
 -   `path`: Directory to index
 -   `provider`: Embedding provider (auto/openai/transformers/ollama/cohere)
--   **Creates**: `.pampa/` directory with database and chunks
+-   **Creates**: `.pampax/` directory with database and chunks
 
 ### `update_project(path=".", provider="auto")`
 
@@ -349,14 +349,14 @@ graph TD
 
 ## 🎉 Success Stories
 
-**Before PAMPA**: "I'll create a new validation function"
-**With PAMPA**: "Let me search for existing validation → Found 3 similar functions → Extended the best one"
+**Before PAMPAX**: "I'll create a new validation function"
+**With PAMPAX**: "Let me search for existing validation → Found 3 similar functions → Extended the best one"
 
-**Before PAMPA**: "I need an API endpoint for users"  
-**With PAMPA**: "Searched for API patterns → Found consistent structure → Followed same pattern"
+**Before PAMPAX**: "I need an API endpoint for users"  
+**With PAMPAX**: "Searched for API patterns → Found consistent structure → Followed same pattern"
 
-**Before PAMPA**: "Where's the database connection code?"
-**With PAMPA**: "search_code('database connection') → Found in 2 seconds"
+**Before PAMPAX**: "Where's the database connection code?"
+**With PAMPAX**: "search_code('database connection') → Found in 2 seconds"
 
 ## 🆕 New in v1.12: Advanced Features
 
@@ -401,7 +401,7 @@ search_code('refund transaction'); // → Only Stripe refund logic
 ### ⚡ Performance Tips
 
 -   **Use scoped searches** for faster, more relevant results
--   **Enable file watching** (`pampa watch`) for real-time updates
+-   **Enable file watching** (`pampax watch`) for real-time updates
 -   **Use reranker** for critical searches: `reranker: "transformers"`
 -   **Leverage symbol boost** for function-specific searches
 
@@ -412,14 +412,14 @@ search_code('refund transaction'); // → Only Stripe refund logic
 -   **MCP rule file**: [RULE_FOR_PAMPA_MCP.md](RULE_FOR_PAMPA_MCP.md)
 -   **🆕 Migration guide**: [MIGRATION_GUIDE_v1.12.md](MIGRATION_GUIDE_v1.12.md)
 -   **🆕 Multi-project demo**: [DEMO_MULTI_PROJECT.md](DEMO_MULTI_PROJECT.md)
--   **Project repository**: https://github.com/tecnomanu/pampa
+-   **Project repository**: https://github.com/lemon07r/pampax
 
 ## 🚨 Troubleshooting for AI Agents
 
-### If PAMPA tools are not available:
+### If PAMPAX tools are not available:
 
 1. **Check MCP configuration**: Ensure your human configured the MCP server correctly
-2. **Verify installation**: Ask them to run `npx pampa --version`
+2. **Verify installation**: Ask them to run `npx pampax --version`
 3. **Enable debug mode**: Add `--debug` to MCP args for detailed logs
 4. **Check permissions**: Ensure write access to project directory
 
@@ -427,8 +427,8 @@ search_code('refund transaction'); // → Only Stripe refund logic
 
 1. **Check embedding provider**: Transformers.js (free) vs OpenAI (requires API key)
 2. **Verify project structure**: Must be a valid code project with supported files
-3. **Check disk space**: Indexing creates `.pampa/` directory with database
+3. **Check disk space**: Indexing creates `.pampax/` directory with database
 
 ---
 
-🤖 **Remember**: PAMPA is your project memory. Use it continuously to avoid duplicating work and to understand existing codebase architecture. It's like having perfect memory of every function ever written in the project!
+🤖 **Remember**: PAMPAX is your project memory. Use it continuously to avoid duplicating work and to understand existing codebase architecture. It's like having perfect memory of every function ever written in the project!
