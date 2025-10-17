@@ -1,14 +1,15 @@
-# 🎉 PAMPAX v1.13.0 - Complete Release Summary
+# 🎉 PAMPAX v1.13 Series - Complete Release Summary
 
-**Release Date:** October 17, 2024  
-**Status:** ✅ **SUCCESSFULLY PUBLISHED TO NPM**
+**Series Release Dates:** October 17, 2024 – January 17, 2025  
+**Current Version:** `1.13.2`  
+**Status:** ✅ **PUBLISHED TO NPM**
 
 ---
 
 ## 📦 Package Information
 
 **Package Name:** `pampax`  
-**Version:** `1.13.0`  
+**Latest Version:** `1.13.2` (Patch update from v1.13.0)  
 **NPM Registry:** https://registry.npmjs.org/pampax  
 **NPM Page:** https://www.npmjs.com/package/pampax  
 **GitHub:** https://github.com/lemon07r/pampax
@@ -57,6 +58,31 @@ npm install -g pampax
 4. **MCP stdio protocol corruption fix** (from v1.12.3)
    - Moved logs to stderr, reserved stdout for protocol
    - **Impact:** Fixed MCP client hangs on startup
+
+### 🔧 Patch Update (v1.13.2) - Tree-sitter Performance Fix
+
+**Tree-sitter "Invalid argument" error - PROPERLY FIXED**
+
+- **Problem:** v1.13.0-1.13.1 handled large files (>30KB) with fallback indexing when tree-sitter threw "Invalid argument" errors
+- **Root Cause:** String-based `parse()` API has documented limitations with large files
+- **Solution:** Implemented tree-sitter's official callback-based streaming API for large files
+- **Benefits:** Eliminates errors, improves performance (no exception overhead), handles unlimited file sizes
+
+```javascript
+const SIZE_THRESHOLD = 30000; // 30KB
+if (source.length > SIZE_THRESHOLD) {
+    tree = parser.parse((index, position) => {
+        if (index < source.length) {
+            return source.slice(index, Math.min(index + CHUNK_SIZE, source.length));
+        }
+        return null;
+    });
+} else {
+    tree = parser.parse(source);
+}
+```
+
+**References:** [tree-sitter #3473](https://github.com/tree-sitter/tree-sitter/issues/3473), [node-tree-sitter streaming](https://github.com/tree-sitter/node-tree-sitter/blob/master/README.md#parse-from-custom-data-structure)
 
 ### ✨ New Features (4)
 
@@ -198,22 +224,34 @@ This fork includes significant enhancements and critical bug fixes built upon th
 
 ---
 
+---
+
+## 🎯 v1.13 Series Summary
+
+The v1.13 series consists of:
+- **v1.13.0** (Oct 17, 2024): Major release with bug fixes, new features, and PAMPAX rebrand
+- **v1.13.1-v1.13.2** (Oct 17, 2025): Patch release with tree-sitter streaming API implementation
+
+**Current Status:** ✅ All systems operational, all tests passing (11/11)
+
+---
+
 **🎉 Release Status: COMPLETE AND SUCCESSFUL! 🎉**
 
-The PAMPAX v1.13.0 package is now live on npm and ready for global use!
+The PAMPAX v1.13 package series is live on npm and ready for global use!
 
 **Installation:**
 ```bash
-npm install -g pampax
+npm install -g pampax@latest
 ```
 
-**Registry Verification:**
+**Current Version:**
 ```bash
 npm view pampax
-# Output: pampax@1.13.0
+# Output: pampax@1.13.2
 ```
 
 ---
 
-**End of Release Summary**  
-**Generated:** October 17, 2024  
+**End of Release Summary (v1.13 Series)**  
+**Updated:** October 17, 2025  

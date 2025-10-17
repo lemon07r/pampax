@@ -1,6 +1,6 @@
 # PAMPAX – Protocol for Augmented Memory of Project Artifacts Extended
 
-**Enhanced fork** with native support for OpenAI-compatible APIs (OpenAI, LM Studio, llama.cpp, Azure, Novita.ai, etc.) and flexible reranking models (local Transformers.js or remote APIs). Performance benchmarks show significant improvements with advanced reranking—perfect scores with Qwen3-Reranker-8B. This fork also includes important bug fixes discovered during active use. For detailed changes, see [CHANGELOG.md](CHANGELOG.md) or [RELEASE_SUMMARY_v1.13.md](RELEASE_SUMMARY_v1.13.md).
+**Enhanced fork** with native support for OpenAI-compatible APIs (OpenAI, LM Studio, llama.cpp, Azure, Novita.ai, etc.) and flexible reranking models (local Transformers.js or remote APIs). Performance benchmarks show significant improvements with advanced reranking—perfect scores with Qwen3-Reranker-8B. This fork also includes several important bug fixes, better handling of large files, and immproved performance. For detailed changes, see [CHANGELOG.md](CHANGELOG.md) or [RELEASE_SUMMARY_v1.13.md](RELEASE_SUMMARY_v1.13.md).
 
 **Version 1.13.x** · **Semantic Search** · **MCP Compatible** · **Node.js**
 
