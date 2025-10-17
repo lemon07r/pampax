@@ -1,6 +1,6 @@
 # PAMPAX – Protocol for Augmented Memory of Project Artifacts Extended
 
-This fork adds native support for any OpenAI compatible API endpoints (so use any provider, or local api like llama.cpp server/lmstudio/etc), and support for any Reranking models instead of only supporting the previous local-only Transform.js implementation. This should open up better performing model options both for emebedding and reranking.
+This fork adds native support for any OpenAI compatible API endpoints (so use any provider, or local api like llama.cpp server/lmstudio/etc), and support for any Reranking models instead of only supporting the previous local-only Transform.js implementation. The benchmark shows a significant improvment in performance when using a better reranking model, see below in the performance metrics section of the readme.
 
 **Version 1.12.x** · **Semantic Search** · **MCP Compatible** · **Node.js**
 
@@ -537,6 +537,7 @@ PAMPAX v1.12 uses a specialized architecture for semantic code search with measu
 
 **Synthetic Benchmark Results:**
 
+Default configuration:
 ```
 | Setting    | P@1   | MRR@5 | nDCG@10 |
 | ---------- | ----- | ----- | ------- |
@@ -545,24 +546,38 @@ PAMPAX v1.12 uses a specialized architecture for semantic code search with measu
 | Hybrid+CE  | 1.000 | 0.958 | 0.967   |
 ```
 
+With Novita.ai Qwen models:
+```
+| Configuration                              | P@1   | MRR@5 | nDCG@10 |
+| ------------------------------------------ | ----- | ----- | ------- |
+| Qwen3-Embedding-8B + Transformers (local)  | 0.750 | 0.875 | 0.908   |
+| Qwen3-Embedding-8B + Qwen3-Reranker-8B     | 1.000 | 1.000 | 1.000   |
+```
+
+🏆 **Qwen3-Reranker-8B achieves perfect scores (100%) across all metrics!**
+
 **Run benchmarks yourself:**
 
 ```bash
 # Run default benchmarks (Base, Hybrid, Hybrid+CE)
 npm run bench
 
-# Test with API reranker (Novita.ai, Cohere, Jina)
+# Test with Qwen models via Novita.ai
+export OPENAI_BASE_URL="https://api.novita.ai/openai"
+export OPENAI_API_KEY="your-novita-key"
+export PAMPAX_OPENAI_EMBEDDING_MODEL="qwen/qwen3-embedding-8b"
 export PAMPAX_RERANK_API_URL="https://api.novita.ai/openai/v1/rerank"
-export PAMPAX_RERANK_API_KEY="your-api-key"
+export PAMPAX_RERANK_API_KEY="your-novita-key"
 export PAMPAX_RERANK_MODEL="qwen/qwen3-reranker-8b"
-npm run bench -- --reranker=api
+export PAMPA_BENCH_RERANKER="api"
+npm run bench
 
-# Custom configurations
-npm run bench -- --modes=hybrid,hybrid-ce
-npm run bench -- --reranker=transformers
+# Test other configurations
+export PAMPA_BENCH_RERANKER="transformers"
+npm run bench
 ```
 
-See [BENCHMARK_v1.12.md](BENCHMARK_v1.12.md) for detailed configuration options.
+See [BENCHMARK_v1.12.md](BENCHMARK_v1.12.md) for detailed configuration options and analysis.
 
 ### 🎯 Search Examples
 

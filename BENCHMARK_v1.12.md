@@ -114,7 +114,7 @@ pampa search "payment processing" --project /path/to/project-b
 
 ### PAMPA v1.12 Measured Performance
 
-**Synthetic Benchmark Results:**
+**Synthetic Benchmark Results (Default Configuration):**
 
 ```
 Benchmark results
@@ -125,12 +125,32 @@ Benchmark results
 | Hybrid+CE  | 1.000 | 0.958 | 0.967   |
 ```
 
-**Key Metrics:**
+**With Novita.ai Qwen Models:**
 
--   **Precision@1**: 87.5% with hybrid search
--   **Mean Reciprocal Rank**: 91.7% average
--   **Normalized DCG**: 93.4% relevance quality
--   **Response Time**: ~1-2 seconds (pre-indexed)
+```
+Benchmark results
+| Configuration                              | P@1   | MRR@5 | nDCG@10 |
+| ---                                        | ---   | ---   | ---     |
+| Qwen3-Embedding-8B + Transformers (local)  | 0.750 | 0.875 | 0.908   |
+| Qwen3-Embedding-8B + Qwen3-Reranker-8B     | 1.000 | 1.000 | 1.000   |
+```
+
+**Key Findings:**
+
+-   **Qwen3-Reranker-8B**: Achieves **perfect scores** (100%) across all metrics
+-   **Precision@1**: 100% - Every top result is the most relevant
+-   **Mean Reciprocal Rank**: 100% - Perfect ranking order
+-   **Normalized DCG**: 100% - Optimal relevance distribution
+-   **Response Time**: ~1-2 seconds (pre-indexed + API calls)
+
+**Comparison Summary:**
+
+| Reranker                    | P@1   | MRR@5 | nDCG@10 | Cost    | Speed   |
+| ---                         | ---   | ---   | ---     | ---     | ---     |
+| Transformers (local)        | 0.750 | 0.875 | 0.908   | Free    | Fast    |
+| Qwen3-Reranker-8B (API)     | 1.000 | 1.000 | 1.000   | Paid    | Fast    |
+
+**Recommendation:** Use **Qwen3-Reranker-8B** for production workloads requiring maximum precision. Use local Transformers reranker for development or cost-sensitive applications.
 
 ### Running Custom Benchmarks
 
@@ -162,10 +182,26 @@ export PAMPAX_RERANK_API_KEY="your-api-key"
 export PAMPAX_RERANK_MODEL="qwen/qwen3-reranker-8b"
 
 # Run benchmark with API reranker
-npm run bench -- --reranker=api --modes=hybrid-ce
-
-# Or use environment variable
 export PAMPA_BENCH_RERANKER=api
+npm run bench
+```
+
+**Reproducing the Qwen3 perfect scores:**
+```bash
+# Set up Novita.ai with Qwen3 models
+export OPENAI_BASE_URL="https://api.novita.ai/openai"
+export OPENAI_API_KEY="your-novita-api-key"
+export PAMPAX_OPENAI_EMBEDDING_MODEL="qwen/qwen3-embedding-8b"
+export PAMPAX_RERANK_API_URL="https://api.novita.ai/openai/v1/rerank"
+export PAMPAX_RERANK_API_KEY="your-novita-api-key"
+export PAMPAX_RERANK_MODEL="qwen/qwen3-reranker-8b"
+
+# Run with Qwen3-Reranker-8B (achieves 100% scores)
+export PAMPA_BENCH_RERANKER=api
+npm run bench
+
+# Compare with local transformers reranker
+export PAMPA_BENCH_RERANKER=transformers
 npm run bench
 ```
 
