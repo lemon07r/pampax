@@ -50,9 +50,9 @@ if (!sqliteAvailable) {
     }
 
     test('writes encrypted chunks when encryption is enabled', async () => {
-        const originalKey = process.env.PAMPA_ENCRYPTION_KEY;
+        const originalKey = process.env.PAMPAX_ENCRYPTION_KEY;
         const testKey = Buffer.alloc(32, 7).toString('base64');
-        process.env.PAMPA_ENCRYPTION_KEY = testKey;
+        process.env.PAMPAX_ENCRYPTION_KEY = testKey;
         resetEncryptionCacheForTests();
 
         const providerStub = createProviderStub();
@@ -84,13 +84,13 @@ if (!sqliteAvailable) {
             assert.equal(chunk.success, true);
             assert.match(chunk.code, /validateToken/);
 
-            delete process.env.PAMPA_ENCRYPTION_KEY;
+            delete process.env.PAMPAX_ENCRYPTION_KEY;
             resetEncryptionCacheForTests();
             const missingKeyResult = await getChunk(metadata.sha, repoDir);
             assert.equal(missingKeyResult.success, false);
             assert.match(missingKeyResult.error, /encrypted/i);
 
-            process.env.PAMPA_ENCRYPTION_KEY = testKey;
+            process.env.PAMPAX_ENCRYPTION_KEY = testKey;
             resetEncryptionCacheForTests();
 
             const encryptedData = await fs.readFile(encryptedPath);
@@ -103,9 +103,9 @@ if (!sqliteAvailable) {
             assert.match(tampered.error, /authentication failed/i);
         } finally {
             if (originalKey === undefined) {
-                delete process.env.PAMPA_ENCRYPTION_KEY;
+                delete process.env.PAMPAX_ENCRYPTION_KEY;
             } else {
-                process.env.PAMPA_ENCRYPTION_KEY = originalKey;
+                process.env.PAMPAX_ENCRYPTION_KEY = originalKey;
             }
             resetEncryptionCacheForTests();
             __resetTestProviderFactory();
@@ -114,8 +114,8 @@ if (!sqliteAvailable) {
     });
 
     test('plaintext chunks remain readable without encryption key', async () => {
-        const originalKey = process.env.PAMPA_ENCRYPTION_KEY;
-        delete process.env.PAMPA_ENCRYPTION_KEY;
+        const originalKey = process.env.PAMPAX_ENCRYPTION_KEY;
+        delete process.env.PAMPAX_ENCRYPTION_KEY;
         resetEncryptionCacheForTests();
 
         const providerStub = createProviderStub();
@@ -148,9 +148,9 @@ if (!sqliteAvailable) {
             assert.match(chunk.code, /sum/);
         } finally {
             if (originalKey === undefined) {
-                delete process.env.PAMPA_ENCRYPTION_KEY;
+                delete process.env.PAMPAX_ENCRYPTION_KEY;
             } else {
-                process.env.PAMPA_ENCRYPTION_KEY = originalKey;
+                process.env.PAMPAX_ENCRYPTION_KEY = originalKey;
             }
             resetEncryptionCacheForTests();
             __resetTestProviderFactory();

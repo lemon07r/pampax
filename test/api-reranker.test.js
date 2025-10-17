@@ -30,34 +30,34 @@ function assertTest(condition, testName) {
 async function testConfiguration() {
     console.log('Test 1: API reranking configuration detection\n');
     
-    const originalUrl = process.env.PAMPA_RERANK_API_URL;
-    const originalKey = process.env.PAMPA_RERANK_API_KEY;
+    const originalUrl = process.env.PAMPAX_RERANK_API_URL;
+    const originalKey = process.env.PAMPAX_RERANK_API_KEY;
     
     // Test: No configuration
-    delete process.env.PAMPA_RERANK_API_URL;
-    delete process.env.PAMPA_RERANK_API_KEY;
+    delete process.env.PAMPAX_RERANK_API_URL;
+    delete process.env.PAMPAX_RERANK_API_KEY;
     assertTest(!isAPIRerankingConfigured(), 'Detects missing configuration');
     
     // Test: Only URL, no key
-    process.env.PAMPA_RERANK_API_URL = 'http://localhost:8000/rerank';
-    delete process.env.PAMPA_RERANK_API_KEY;
+    process.env.PAMPAX_RERANK_API_URL = 'http://localhost:8000/rerank';
+    delete process.env.PAMPAX_RERANK_API_KEY;
     assertTest(!isAPIRerankingConfigured(), 'Requires both URL and key');
     
     // Test: Only key, no URL
-    delete process.env.PAMPA_RERANK_API_URL;
-    process.env.PAMPA_RERANK_API_KEY = 'test-key';
+    delete process.env.PAMPAX_RERANK_API_URL;
+    process.env.PAMPAX_RERANK_API_KEY = 'test-key';
     assertTest(!isAPIRerankingConfigured(), 'Requires both URL and key');
     
     // Test: Both URL and key
-    process.env.PAMPA_RERANK_API_URL = 'http://localhost:8000/rerank';
-    process.env.PAMPA_RERANK_API_KEY = 'test-key';
+    process.env.PAMPAX_RERANK_API_URL = 'http://localhost:8000/rerank';
+    process.env.PAMPAX_RERANK_API_KEY = 'test-key';
     assertTest(isAPIRerankingConfigured(), 'Detects full configuration');
     
     // Restore
-    if (originalUrl) process.env.PAMPA_RERANK_API_URL = originalUrl;
-    else delete process.env.PAMPA_RERANK_API_URL;
-    if (originalKey) process.env.PAMPA_RERANK_API_KEY = originalKey;
-    else delete process.env.PAMPA_RERANK_API_KEY;
+    if (originalUrl) process.env.PAMPAX_RERANK_API_URL = originalUrl;
+    else delete process.env.PAMPAX_RERANK_API_URL;
+    if (originalKey) process.env.PAMPAX_RERANK_API_KEY = originalKey;
+    else delete process.env.PAMPAX_RERANK_API_KEY;
     
     console.log('');
 }
@@ -133,8 +133,8 @@ async function testFactoryRouting() {
     
     // Test: Auto mode without configuration
     __setForceRerankMode(null);
-    delete process.env.PAMPA_RERANK_API_URL;
-    delete process.env.PAMPA_RERANK_API_KEY;
+    delete process.env.PAMPAX_RERANK_API_URL;
+    delete process.env.PAMPAX_RERANK_API_KEY;
     
     const autoResult = await rerankCrossEncoder('test', candidates);
     assertTest(autoResult.length === candidates.length, 'Auto mode falls back to local');
@@ -178,42 +178,42 @@ async function testScoringAndRanking() {
 async function testEnvironmentConfigurations() {
     console.log('Test 5: Environment variable configurations\n');
     
-    const originalUrl = process.env.PAMPA_RERANK_API_URL;
-    const originalKey = process.env.PAMPA_RERANK_API_KEY;
-    const originalModel = process.env.PAMPA_RERANK_MODEL;
-    const originalMax = process.env.PAMPA_RERANKER_MAX;
+    const originalUrl = process.env.PAMPAX_RERANK_API_URL;
+    const originalKey = process.env.PAMPAX_RERANK_API_KEY;
+    const originalModel = process.env.PAMPAX_RERANK_MODEL;
+    const originalMax = process.env.PAMPAX_RERANKER_MAX;
     
     // Test: Cohere configuration
-    process.env.PAMPA_RERANK_API_URL = 'https://api.cohere.ai/v1/rerank';
-    process.env.PAMPA_RERANK_API_KEY = 'cohere-key';
-    process.env.PAMPA_RERANK_MODEL = 'rerank-v3.5';
+    process.env.PAMPAX_RERANK_API_URL = 'https://api.cohere.ai/v1/rerank';
+    process.env.PAMPAX_RERANK_API_KEY = 'cohere-key';
+    process.env.PAMPAX_RERANK_MODEL = 'rerank-v3.5';
     
     assertTest(isAPIRerankingConfigured(), 'Cohere configuration detected');
-    console.log(`  ℹ️  URL: ${process.env.PAMPA_RERANK_API_URL}`);
-    console.log(`  ℹ️  Model: ${process.env.PAMPA_RERANK_MODEL}`);
+    console.log(`  ℹ️  URL: ${process.env.PAMPAX_RERANK_API_URL}`);
+    console.log(`  ℹ️  Model: ${process.env.PAMPAX_RERANK_MODEL}`);
     
     // Test: Jina AI configuration
-    process.env.PAMPA_RERANK_API_URL = 'https://api.jina.ai/v1/rerank';
-    process.env.PAMPA_RERANK_API_KEY = 'jina-key';
-    process.env.PAMPA_RERANK_MODEL = 'jina-reranker-v2-base-multilingual';
+    process.env.PAMPAX_RERANK_API_URL = 'https://api.jina.ai/v1/rerank';
+    process.env.PAMPAX_RERANK_API_KEY = 'jina-key';
+    process.env.PAMPAX_RERANK_MODEL = 'jina-reranker-v2-base-multilingual';
     
     assertTest(isAPIRerankingConfigured(), 'Jina AI configuration detected');
-    console.log(`  ℹ️  URL: ${process.env.PAMPA_RERANK_API_URL}`);
-    console.log(`  ℹ️  Model: ${process.env.PAMPA_RERANK_MODEL}`);
+    console.log(`  ℹ️  URL: ${process.env.PAMPAX_RERANK_API_URL}`);
+    console.log(`  ℹ️  Model: ${process.env.PAMPAX_RERANK_MODEL}`);
     
     // Test: Custom max candidates
-    process.env.PAMPA_RERANKER_MAX = '25';
+    process.env.PAMPAX_RERANKER_MAX = '25';
     assertTest(true, 'Custom max candidates configurable');
     
     // Restore
-    if (originalUrl) process.env.PAMPA_RERANK_API_URL = originalUrl;
-    else delete process.env.PAMPA_RERANK_API_URL;
-    if (originalKey) process.env.PAMPA_RERANK_API_KEY = originalKey;
-    else delete process.env.PAMPA_RERANK_API_KEY;
-    if (originalModel) process.env.PAMPA_RERANK_MODEL = originalModel;
-    else delete process.env.PAMPA_RERANK_MODEL;
-    if (originalMax) process.env.PAMPA_RERANKER_MAX = originalMax;
-    else delete process.env.PAMPA_RERANKER_MAX;
+    if (originalUrl) process.env.PAMPAX_RERANK_API_URL = originalUrl;
+    else delete process.env.PAMPAX_RERANK_API_URL;
+    if (originalKey) process.env.PAMPAX_RERANK_API_KEY = originalKey;
+    else delete process.env.PAMPAX_RERANK_API_KEY;
+    if (originalModel) process.env.PAMPAX_RERANK_MODEL = originalModel;
+    else delete process.env.PAMPAX_RERANK_MODEL;
+    if (originalMax) process.env.PAMPAX_RERANKER_MAX = originalMax;
+    else delete process.env.PAMPAX_RERANKER_MAX;
     
     console.log('');
 }
@@ -278,15 +278,15 @@ async function runAllTests() {
         
         console.log('\n💡 Manual Testing Guide:');
         console.log('\n  With Cohere Rerank API:');
-        console.log('    export PAMPA_RERANK_API_URL="https://api.cohere.ai/v1/rerank"');
-        console.log('    export PAMPA_RERANK_API_KEY="your-cohere-api-key"');
-        console.log('    export PAMPA_RERANK_MODEL="rerank-english-v3.0"');
+        console.log('    export PAMPAX_RERANK_API_URL="https://api.cohere.ai/v1/rerank"');
+        console.log('    export PAMPAX_RERANK_API_KEY="your-cohere-api-key"');
+        console.log('    export PAMPAX_RERANK_MODEL="rerank-english-v3.0"');
         console.log('    npx pampa search "authentication logic" --reranker api');
         
         console.log('\n  With Jina AI Reranker:');
-        console.log('    export PAMPA_RERANK_API_URL="https://api.jina.ai/v1/rerank"');
-        console.log('    export PAMPA_RERANK_API_KEY="your-jina-api-key"');
-        console.log('    export PAMPA_RERANK_MODEL="jina-reranker-v2-base-multilingual"');
+        console.log('    export PAMPAX_RERANK_API_URL="https://api.jina.ai/v1/rerank"');
+        console.log('    export PAMPAX_RERANK_API_KEY="your-jina-api-key"');
+        console.log('    export PAMPAX_RERANK_MODEL="jina-reranker-v2-base-multilingual"');
         console.log('    npx pampa search "payment processing" --reranker api');
         
         return testsFailed === 0;

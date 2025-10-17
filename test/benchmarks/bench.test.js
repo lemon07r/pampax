@@ -21,8 +21,8 @@ let sqlite3Module;
 let searchCode;
 let clearBasePath;
 
-if (!process.env.PAMPA_MOCK_RERANKER_TESTS) {
-    process.env.PAMPA_MOCK_RERANKER_TESTS = '1';
+if (!process.env.PAMPAX_MOCK_RERANKER_TESTS) {
+    process.env.PAMPAX_MOCK_RERANKER_TESTS = '1';
 }
 
 try {

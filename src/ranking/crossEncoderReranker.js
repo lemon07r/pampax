@@ -1,7 +1,7 @@
 import { rerankWithAPI, isAPIRerankingConfigured } from './apiReranker.js';
 
-const DEFAULT_MODEL_ID = process.env.PAMPA_RERANKER_MODEL || 'Xenova/ms-marco-MiniLM-L-6-v2';
-const DEFAULT_MAX_CANDIDATES = Number.parseInt(process.env.PAMPA_RERANKER_MAX || '50', 10);
+const DEFAULT_MODEL_ID = process.env.PAMPAX_RERANKER_MODEL || 'Xenova/ms-marco-MiniLM-L-6-v2';
+const DEFAULT_MAX_CANDIDATES = Number.parseInt(process.env.PAMPAX_RERANKER_MAX || '50', 10);
 
 let pipelineFactory = null;
 let modelPromise = null;
@@ -11,7 +11,7 @@ let testForceLoadFailure = false;
 let forceRerankMode = null; // For testing: 'api', 'local', or null for auto
 
 function shouldMock() {
-    return process.env.PAMPA_MOCK_RERANKER_TESTS === '1';
+    return process.env.PAMPAX_MOCK_RERANKER_TESTS === '1';
 }
 
 function getDefaultMaxCandidates() {

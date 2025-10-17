@@ -1,17 +1,17 @@
 {
-	"name": "pampa",
+	"name": "pampax",
 	"version": "1.12.2",
-	"description": "PAMPA – Protocol for Augmented Memory of Project Artifacts (MCP compatible)",
+	"description": "PAMPAX – Protocol for Augmented Memory of Project Artifacts Extended (MCP compatible)",
 	"author": "Manuel Bruña",
 	"type": "module",
 	"license": "ISC",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/tecnomanu/pampa.git"
+		"url": "https://github.com/lemon07r/pampax.git"
 	},
 	"bin": {
-		"pampa": "src/cli.js",
-		"pampa-mcp": "src/mcp-server.js"
+		"pampax": "src/cli.js",
+		"pampax-mcp": "src/mcp-server.js"
 	},
 	"files": [
 		"src/",

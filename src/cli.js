@@ -29,7 +29,7 @@ program
     .option('-p, --provider <provider>', 'embedding provider (auto|openai|transformers|ollama|cohere)', 'auto')
     .option('--project <path>', 'alias for project path (same as [path] argument)')
     .option('--directory <path>', 'alias for project directory (same as [path] argument)')
-    .option('--encrypt <mode>', 'encrypt chunk payloads when PAMPA_ENCRYPTION_KEY is configured (on|off)')
+    .option('--encrypt <mode>', 'encrypt chunk payloads when PAMPAX_ENCRYPTION_KEY is configured (on|off)')
     .action(async (projectPath = '.', options) => {
         const resolvedPath = options.project || options.directory || projectPath || '.';
         console.log('Starting project indexing...');
@@ -49,7 +49,7 @@ program
     .option('-p, --provider <provider>', 'embedding provider (auto|openai|transformers|ollama|cohere)', 'auto')
     .option('--project <path>', 'alias for project path (same as [path] argument)')
     .option('--directory <path>', 'alias for project directory (same as [path] argument)')
-    .option('--encrypt <mode>', 'encrypt chunk payloads when PAMPA_ENCRYPTION_KEY is configured (on|off)')
+    .option('--encrypt <mode>', 'encrypt chunk payloads when PAMPAX_ENCRYPTION_KEY is configured (on|off)')
     .action(async (projectPath = '.', options) => {
         const resolvedPath = options.project || options.directory || projectPath || '.';
         console.log('🔄 Updating project index...');
@@ -72,7 +72,7 @@ program
     .option('--project <path>', 'alias for project path (same as [path] argument)')
     .option('--directory <path>', 'alias for project directory (same as [path] argument)')
     .option('-d, --debounce <ms>', 'debounce interval in milliseconds (default 500)', '500')
-    .option('--encrypt <mode>', 'encrypt chunk payloads when PAMPA_ENCRYPTION_KEY is configured (on|off)')
+    .option('--encrypt <mode>', 'encrypt chunk payloads when PAMPAX_ENCRYPTION_KEY is configured (on|off)')
     .action(async (projectPath = '.', options) => {
         const resolvedPath = options.project || options.directory || projectPath || '.';
         const parsedDebounce = Number.parseInt(options.debounce, 10);

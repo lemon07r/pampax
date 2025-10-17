@@ -14,28 +14,28 @@ let testRerankOverride = null;
  * Get the API URL from environment (or empty string)
  */
 function getAPIUrl() {
-    return process.env.PAMPA_RERANK_API_URL || '';
+    return process.env.PAMPAX_RERANK_API_URL || '';
 }
 
 /**
  * Get the API key from environment (or empty string)
  */
 function getAPIKey() {
-    return process.env.PAMPA_RERANK_API_KEY || '';
+    return process.env.PAMPAX_RERANK_API_KEY || '';
 }
 
 /**
  * Get the model name from environment (or default)
  */
 function getModel() {
-    return process.env.PAMPA_RERANK_MODEL || 'rerank-v3.5';
+    return process.env.PAMPAX_RERANK_MODEL || 'rerank-v3.5';
 }
 
 /**
  * Get max candidates from environment (or default)
  */
 function getMaxFromEnv() {
-    const envMax = Number.parseInt(process.env.PAMPA_RERANKER_MAX || '50', 10);
+    const envMax = Number.parseInt(process.env.PAMPAX_RERANKER_MAX || '50', 10);
     return Number.isFinite(envMax) && envMax > 0 ? envMax : 50;
 }
 
@@ -113,11 +113,11 @@ async function callRerankAPI(query, documents, config = {}) {
     const model = config.model || getModel();
 
     if (!apiUrl) {
-        throw new Error('PAMPA_RERANK_API_URL is not configured');
+        throw new Error('PAMPAX_RERANK_API_URL is not configured');
     }
 
     if (!apiKey) {
-        throw new Error('PAMPA_RERANK_API_KEY is not configured');
+        throw new Error('PAMPAX_RERANK_API_KEY is not configured');
     }
 
     // Build request body (compatible with Cohere, Jina AI, and similar APIs)

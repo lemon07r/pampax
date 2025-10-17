@@ -163,14 +163,14 @@ if (!sqliteAvailable) {
 
     test('CLI context pack applies defaults to search scope', async (t) => {
         const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'pampa-context-cli-'));
-        const originalMockEnv = process.env.PAMPA_MOCK_RERANKER_TESTS;
+        const originalMockEnv = process.env.PAMPAX_MOCK_RERANKER_TESTS;
 
         try {
             await seedDatabase(tmpDir, sqlite3);
             await writeContextPack(tmpDir);
 
             const cliResult = await runCliCommand(['context', 'use', 'stripe-backend', tmpDir], tmpDir, {
-                PAMPA_MOCK_RERANKER_TESTS: '1'
+                PAMPAX_MOCK_RERANKER_TESTS: '1'
             });
             assert.equal(cliResult.code, 0, cliResult.stderr);
 
@@ -179,7 +179,7 @@ if (!sqliteAvailable) {
             assert.equal(activePack.key, 'stripe-backend');
             assert.equal(activePack.scope.path_glob[0], 'app/Services/**');
 
-            process.env.PAMPA_MOCK_RERANKER_TESTS = '1';
+            process.env.PAMPAX_MOCK_RERANKER_TESTS = '1';
 
             const providerStub = {
                 async generateEmbedding() {
@@ -219,9 +219,9 @@ if (!sqliteAvailable) {
             clearBasePath();
             clearContextPackCache();
             if (typeof originalMockEnv === 'undefined') {
-                delete process.env.PAMPA_MOCK_RERANKER_TESTS;
+                delete process.env.PAMPAX_MOCK_RERANKER_TESTS;
             } else {
-                process.env.PAMPA_MOCK_RERANKER_TESTS = originalMockEnv;
+                process.env.PAMPAX_MOCK_RERANKER_TESTS = originalMockEnv;
             }
             await fs.rm(tmpDir, { recursive: true, force: true });
         }
@@ -229,7 +229,7 @@ if (!sqliteAvailable) {
 
     test('MCP use_context_pack applies session defaults', async () => {
         const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'pampa-context-mcp-'));
-        const originalMockEnv = process.env.PAMPA_MOCK_RERANKER_TESTS;
+        const originalMockEnv = process.env.PAMPAX_MOCK_RERANKER_TESTS;
 
         try {
             await seedDatabase(tmpDir, sqlite3);
@@ -256,7 +256,7 @@ if (!sqliteAvailable) {
             assert.ok(sessionPack, 'session pack should be stored');
             assert.equal(sessionPack.key, 'stripe-backend');
 
-            process.env.PAMPA_MOCK_RERANKER_TESTS = '1';
+            process.env.PAMPAX_MOCK_RERANKER_TESTS = '1';
             const providerStub = {
                 async generateEmbedding() {
                     return [0.9, 0.1, 0];
@@ -300,9 +300,9 @@ if (!sqliteAvailable) {
             clearBasePath();
             clearContextPackCache();
             if (typeof originalMockEnv === 'undefined') {
-                delete process.env.PAMPA_MOCK_RERANKER_TESTS;
+                delete process.env.PAMPAX_MOCK_RERANKER_TESTS;
             } else {
-                process.env.PAMPA_MOCK_RERANKER_TESTS = originalMockEnv;
+                process.env.PAMPAX_MOCK_RERANKER_TESTS = originalMockEnv;
             }
             await fs.rm(tmpDir, { recursive: true, force: true });
         }

@@ -9,11 +9,8 @@ This fork adds native support for any OpenAI compatible API endpoints (so use an
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/npm/v/pampa.svg" alt="Version" />
-  <img src="https://img.shields.io/npm/dm/pampa.svg" alt="Downloads" />
-  <img src="https://img.shields.io/github/license/tecnomanu/pampa" alt="License" />
-  <img src="https://img.shields.io/github/last-commit/tecnomanu/pampa" alt="Last Commit" />
-  <img src="https://img.shields.io/github/actions/workflow/status/tecnomanu/pampa/CI" alt="Build Status" />
+  <img src="https://img.shields.io/github/license/lemon07r/pampax" alt="License" />
+  <img src="https://img.shields.io/github/last-commit/lemon07r/pampax" alt="Last Commit" />
 </p>
 
 Give your AI agents an always-updated, queryable memory of any codebase – with **intelligent semantic search** and **automatic learning** – in one `npx` command.
@@ -44,7 +41,7 @@ Give your AI agents an always-updated, queryable memory of any codebase – with
 -   **90% reduction in duplicate** function creation with symbol boost
 -   **Specialized architecture** for semantic code search
 
-## 🌟 Why PAMPA?
+## 🌟 Why PAMPAX?
 
 Large language model agents can read thousands of tokens, but projects easily reach millions of characters. Without an intelligent retrieval layer, agents:
 
@@ -53,14 +50,14 @@ Large language model agents can read thousands of tokens, but projects easily re
 -   **Waste tokens** loading repetitive code (`vendor/`, `node_modules/`...)
 -   **Fail** when the repository grows
 
-PAMPA solves this by turning your repository into a **semantic code memory graph**:
+PAMPAX solves this by turning your repository into a **semantic code memory graph**:
 
 1. **Chunking** – Each function/class becomes an atomic chunk
 2. **Semantic Tagging** – Automatic extraction of semantic tags from code context
 3. **Embedding** – Enhanced chunks are vectorized with advanced embedding models
 4. **Learning** – System learns from successful searches and caches intentions
 5. **Indexing** – Vectors + semantic metadata live in local SQLite
-6. **Codemap** – A lightweight `pampa.codemap.json` commits to git so context follows the repo
+6. **Codemap** – A lightweight `pampax.codemap.json` commits to git so context follows the repo
 7. **Serving** – An MCP server exposes intelligent search and retrieval tools
 
 Any MCP-compatible agent (Cursor, Claude, etc.) can now search with natural language, get instant responses for learned patterns, and stay synchronized – without scanning the entire tree.
@@ -69,7 +66,7 @@ Any MCP-compatible agent (Cursor, Claude, etc.) can now search with natural lang
 
 > **🤖 If you're an AI agent:** Read the [complete setup guide for agents →](README_FOR_AGENTS.md)
 > or
-> **👤 If you're human:** Share the [agent setup guide](README_FOR_AGENTS.md) with your AI assistant to automatically configure PAMPA!
+> **👤 If you're human:** Share the [agent setup guide](README_FOR_AGENTS.md) with your AI assistant to automatically configure PAMPAX!
 
 ## 📚 Table of Contents
 
@@ -88,7 +85,7 @@ Any MCP-compatible agent (Cursor, Claude, etc.) can now search with natural lang
 
 ### 🏷️ Automatic Semantic Tagging
 
-PAMPA automatically extracts semantic tags from your code without any special comments:
+PAMPAX automatically extracts semantic tags from your code without any special comments:
 
 ```javascript
 // File: app/Services/Payment/StripeService.php
@@ -117,15 +114,15 @@ The system learns from successful searches and provides instant responses:
 -   **Query Normalization**: Understands variations: `"create"` = `"crear"`, `"session"` = `"sesion"`
 -   **Pattern Recognition**: Groups similar queries: `"[PROVIDER] payment session"`
 
-### 🏷️ Optional @pampa-comments (Complementary)
+### 🏷️ Optional @pampax-comments (Complementary)
 
 Enhance search precision with optional JSDoc-style comments:
 
 ```javascript
 /**
- * @pampa-tags: stripe-checkout, payment-processing, e-commerce-integration
- * @pampa-intent: create secure stripe checkout session for payments
- * @pampa-description: Main function for handling checkout sessions with validation
+ * @pampax-tags: stripe-checkout, payment-processing, e-commerce-integration
+ * @pampax-intent: create secure stripe checkout session for payments
+ * @pampax-description: Main function for handling checkout sessions with validation
  */
 async function createStripeCheckoutSession(sessionData) {
 	// Your code here...
@@ -141,7 +138,7 @@ async function createStripeCheckoutSession(sessionData) {
 
 ### 📊 Search Performance Results
 
-| Search Type     | Without @pampa | With @pampa | Improvement |
+| Search Type     | Without @pampax | With @pampax | Improvement |
 | --------------- | -------------- | ----------- | ----------- |
 | Domain-specific | 0.7331         | 0.8874      | **+21%**    |
 | Intent matching | ~0.6           | **1.0000**  | **+67%**    |
@@ -149,7 +146,7 @@ async function createStripeCheckoutSession(sessionData) {
 
 ## 📝 Supported Languages
 
-PAMPA can index and search code in several languages out of the box:
+PAMPAX can index and search code in several languages out of the box:
 
 -   JavaScript / TypeScript (`.js`, `.ts`, `.tsx`, `.jsx`)
 -   PHP (`.php`)
@@ -168,15 +165,15 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 ```json
 {
 	"mcpServers": {
-		"pampa": {
+		"pampax": {
 			"command": "npx",
-			"args": ["-y", "pampa", "mcp"]
+			"args": ["-y", "pampax", "mcp"]
 		}
 	}
 }
 ```
 
-**Optional**: Add `"--debug"` to args for detailed logging: `["-y", "pampa", "mcp", "--debug"]`
+**Optional**: Add `"--debug"` to args for detailed logging: `["-y", "pampax", "mcp", "--debug"]`
 
 #### Cursor
 
@@ -185,9 +182,9 @@ Configure Cursor by creating or editing the `mcp.json` file in your configuratio
 ```json
 {
 	"mcpServers": {
-		"pampa": {
+		"pampax": {
 			"command": "npx",
-			"args": ["-y", "pampa", "mcp"]
+			"args": ["-y", "pampax", "mcp"]
 		}
 	}
 }
@@ -205,7 +202,7 @@ Configure Cursor by creating or editing the `mcp.json` file in your configuratio
 
 ### 3. Install the usage rule for your agent
 
-**Additionally, install this rule in your application so it uses PAMPA effectively:**
+**Additionally, install this rule in your application so it uses PAMPAX effectively:**
 
 Copy the content from [RULE_FOR_PAMPA_MCP.md](RULE_FOR_PAMPA_MCP.md) into your agent or AI system instructions.
 
@@ -228,42 +225,42 @@ For direct terminal usage or manual project indexing:
 
 ```bash
 # Run without installing
-npx pampa --help
+npx pampax --help
 
-# Or install globally (requires Node.js 20+)
-npm install -g pampa
+# Or install globally from GitHub (requires Node.js 20+)
+npm install -g git+https://github.com/lemon07r/pampax.git
 ```
 
 ### Index or update a project
 
 ```bash
 # Index current repository with the best available provider
-npx pampa index
+npx pampax index
 
 # Force the local CPU embedding model (no API keys required)
-npx pampa index --provider transformers
+npx pampax index --provider transformers
 
 # Re-embed after code changes
-npx pampa update
+npx pampax update
 
 # Inspect indexed stats at any time
-npx pampa info
+npx pampax info
 ```
 
-> Indexing writes `.pampa/` (SQLite database + chunk store) and `pampa.codemap.json`. Commit the codemap to git so teammates and CI re-use the same metadata.
+> Indexing writes `.pampax/` (SQLite database + chunk store) and `pampax.codemap.json`. Commit the codemap to git so teammates and CI re-use the same metadata.
 
 | Command                                  | Purpose                                                  |
 | ---------------------------------------- | -------------------------------------------------------- | ----- | ------------------------------------------------- |
-| `npx pampa index [path] [--provider X]`  | Create or refresh the full index at the provided path    |
-| `npx pampa update [path] [--provider X]` | Force a full re-scan (helpful after large refactors)     |
-| `npx pampa watch [path] [--provider X]`  | Incrementally update the index as files change           |
-| `npx pampa search <query>`               | Hybrid BM25 + vector search with optional scoped filters |
-| `npx pampa context <list                 | show                                                     | use>` | Manage reusable context packs for search defaults |
-| `npx pampa mcp`                          | Start the MCP stdio server for editor/agent integrations |
+| `npx pampax index [path] [--provider X]`  | Create or refresh the full index at the provided path    |
+| `npx pampax update [path] [--provider X]` | Force a full re-scan (helpful after large refactors)     |
+| `npx pampax watch [path] [--provider X]`  | Incrementally update the index as files change           |
+| `npx pampax search <query>`               | Hybrid BM25 + vector search with optional scoped filters |
+| `npx pampax context <list                 | show                                                     | use>` | Manage reusable context packs for search defaults |
+| `npx pampax mcp`                          | Start the MCP stdio server for editor/agent integrations |
 
 ### Search with scoped filters & ranking flags
 
-`pampa search` supports the same filters used by MCP clients. Combine glob patterns, semantic tags, language filters, provider overrides, and ranking controls:
+`pampax search` supports the same filters used by MCP clients. Combine glob patterns, semantic tags, language filters, provider overrides, and ranking controls:
 
 | Flag / option         | Effect                                                                |
 | --------------------- | --------------------------------------------------------------------- | --------------- |
@@ -278,28 +275,28 @@ npx pampa info
 
 ```bash
 # Narrow to service files tagged stripe in PHP
-npx pampa search "create checkout session" --path_glob "app/Services/**" --tags stripe --lang php
+npx pampax search "create checkout session" --path_glob "app/Services/**" --tags stripe --lang php
 
 # Use OpenAI embeddings but keep hybrid fusion enabled
-npx pampa search "payment intent status" --provider openai --hybrid on --bm25 on
+npx pampax search "payment intent status" --provider openai --hybrid on --bm25 on
 
 # Reorder top candidates locally
-npx pampa search "oauth middleware" --reranker transformers --limit 5
+npx pampax search "oauth middleware" --reranker transformers --limit 5
 
 # Disable signature boosts for literal keyword hunts
-npx pampa search "token validation" --symbol_boost off
+npx pampax search "token validation" --symbol_boost off
 ```
 
-> PAMPA extracts function signatures and lightweight call graphs with tree-sitter. When symbol boosts are enabled, queries that mention a specific method, class, or a directly connected helper will receive an extra scoring bump.
+> PAMPAX extracts function signatures and lightweight call graphs with tree-sitter. When symbol boosts are enabled, queries that mention a specific method, class, or a directly connected helper will receive an extra scoring bump.
 
 > When a context pack is active, the CLI prints the pack name before executing the search. Any explicit flag overrides the pack defaults.
 
 ### Manage context packs
 
-Store JSON packs in `.pampa/contextpacks/*.json` to capture reusable defaults:
+Store JSON packs in `.pampax/contextpacks/*.json` to capture reusable defaults:
 
 ```jsonc
-// .pampa/contextpacks/stripe-backend.json
+// .pampax/contextpacks/stripe-backend.json
 {
 	"name": "Stripe Backend",
 	"description": "Scopes searches to the Stripe service layer",
@@ -313,16 +310,16 @@ Store JSON packs in `.pampa/contextpacks/*.json` to capture reusable defaults:
 
 ```bash
 # List packs and highlight the active one
-npx pampa context list
+npx pampax context list
 
 # Inspect the full JSON definition
-npx pampa context show stripe-backend
+npx pampax context show stripe-backend
 
 # Activate scoped defaults (flags still win if provided explicitly)
-npx pampa context use stripe-backend
+npx pampax context use stripe-backend
 
 # Clear the active pack (use "none" or "clear")
-npx pampa context use clear
+npx pampax context use clear
 ```
 
 **MCP tip:** The MCP tool `use_context_pack` mirrors the CLI. Agents can switch packs mid-session and every subsequent `search_code` call inherits those defaults until cleared.
@@ -331,10 +328,10 @@ npx pampa context use clear
 
 ```bash
 # Watch the repository with a 750 ms debounce and local embeddings
-npx pampa watch --provider transformers --debounce 750
+npx pampax watch --provider transformers --debounce 750
 ```
 
-The watcher batches filesystem events, reuses the Merkle hash store in `.pampa/merkle.json`, and only re-embeds touched files. Press `Ctrl+C` to stop.
+The watcher batches filesystem events, reuses the Merkle hash store in `.pampax/merkle.json`, and only re-embeds touched files. Press `Ctrl+C` to stop.
 
 ### Run the synthetic benchmark harness
 
@@ -346,16 +343,16 @@ The harness seeds a deterministic Laravel + TypeScript corpus and prints a summa
 
 -   `npm run bench -- --hybrid=off` – run vector-only evaluation
 -   `npm run bench -- --reranker=transformers` – force the cross-encoder
--   `PAMPA_BENCH_MODES=base,hybrid npm run bench` – limit to specific modes
--   `PAMPA_BENCH_BM25=off npm run bench` – disable BM25 candidate generation
+-   `PAMPAX_BENCH_MODES=base,hybrid npm run bench` – limit to specific modes
+-   `PAMPAX_BENCH_BM25=off npm run bench` – disable BM25 candidate generation
 
-Benchmark runs never download external models when `PAMPA_MOCK_RERANKER_TESTS=1` (enabled by default inside the harness).
+Benchmark runs never download external models when `PAMPAX_MOCK_RERANKER_TESTS=1` (enabled by default inside the harness).
 
 An end-to-end context pack example lives in [`examples/contextpacks/stripe-backend.json`](examples/contextpacks/stripe-backend.json).
 
 ## 🧠 Embedding Providers
 
-PAMPA supports multiple providers for generating code embeddings:
+PAMPAX supports multiple providers for generating code embeddings:
 
 | Provider            | Cost                     | Privacy  | Installation                                               |
 | ------------------- | ------------------------ | -------- | ---------------------------------------------------------- |
@@ -369,7 +366,7 @@ PAMPA supports multiple providers for generating code embeddings:
 
 ### Using OpenAI-Compatible APIs
 
-PAMPA supports any OpenAI-compatible API endpoint through environment variables:
+PAMPAX supports any OpenAI-compatible API endpoint through environment variables:
 
 ```bash
 # LM Studio (local)
@@ -391,7 +388,7 @@ export OPENAI_API_KEY="ollama"
 
 Then index with the OpenAI provider:
 ```bash
-npx pampa index --provider openai
+npx pampax index --provider openai
 ```
 
 **Supported Services:**
@@ -404,7 +401,7 @@ npx pampa index --provider openai
 
 ### Using API-Based Reranking
 
-PAMPA supports API-based reranking as an alternative to the local Transformers.js cross-encoder. This allows you to use remote reranking services for improved search precision.
+PAMPAX supports API-based reranking as an alternative to the local Transformers.js cross-encoder. This allows you to use remote reranking services for improved search precision.
 
 **Supported Reranking APIs:**
 - ✅ Cohere Rerank API
@@ -415,15 +412,15 @@ PAMPA supports API-based reranking as an alternative to the local Transformers.j
 **Configuration:**
 ```bash
 # Set reranking API credentials
-export PAMPA_RERANK_API_URL="https://api.cohere.ai/v1"
-export PAMPA_RERANK_API_KEY="your-api-key"
-export PAMPA_RERANK_MODEL="rerank-v3.5"  # Optional, model to use
+export PAMPAX_RERANK_API_URL="https://api.cohere.ai/v1"
+export PAMPAX_RERANK_API_KEY="your-api-key"
+export PAMPAX_RERANK_MODEL="rerank-v3.5"  # Optional, model to use
 
 # Search with API reranker
-npx pampa search "authentication logic" --reranker api
+npx pampax search "authentication logic" --reranker api
 
 # Or use in CLI
-npx pampa search "payment processing" --reranker api --limit 5
+npx pampax search "payment processing" --reranker api --limit 5
 ```
 
 **Reranker Options:**
@@ -433,16 +430,16 @@ npx pampa search "payment processing" --reranker api --limit 5
 
 **Example with Cohere:**
 ```bash
-export PAMPA_RERANK_API_URL="https://api.cohere.ai/v1/rerank"
-export PAMPA_RERANK_API_KEY="your-cohere-api-key"
-export PAMPA_RERANK_MODEL="rerank-english-v3.0"
+export PAMPAX_RERANK_API_URL="https://api.cohere.ai/v1/rerank"
+export PAMPAX_RERANK_API_KEY="your-cohere-api-key"
+export PAMPAX_RERANK_MODEL="rerank-english-v3.0"
 ```
 
 **Example with Jina AI:**
 ```bash
-export PAMPA_RERANK_API_URL="https://api.jina.ai/v1/rerank"
-export PAMPA_RERANK_API_KEY="your-jina-api-key"
-export PAMPA_RERANK_MODEL="jina-reranker-v2-base-multilingual"
+export PAMPAX_RERANK_API_URL="https://api.jina.ai/v1/rerank"
+export PAMPAX_RERANK_API_KEY="your-jina-api-key"
+export PAMPAX_RERANK_MODEL="jina-reranker-v2-base-multilingual"
 ```
 
 **MCP Integration:**
@@ -450,7 +447,7 @@ When API reranking is configured, the MCP `search_code` tool automatically uses 
 
 ## 🏆 Performance Analysis
 
-PAMPA v1.12 uses a specialized architecture for semantic code search with measurable results.
+PAMPAX v1.12 uses a specialized architecture for semantic code search with measurable results.
 
 ### 📊 Performance Metrics
 
@@ -468,15 +465,15 @@ PAMPA v1.12 uses a specialized architecture for semantic code search with measur
 
 ```bash
 # Search for authentication functions
-pampa search "user authentication"
+pampax search "user authentication"
 → AuthController::login, UserService::authenticate, etc.
 
 # Search for payment processing
-pampa search "payment processing"
+pampax search "payment processing"
 → PaymentService::process, CheckoutController::create, etc.
 
 # Search with specific filters
-pampa search "database operations" --lang php --path_glob "app/Models/**"
+pampax search "database operations" --lang php --path_glob "app/Models/**"
 → UserModel::save, OrderModel::find, etc.
 ```
 
@@ -496,15 +493,15 @@ pampa search "database operations" --lang php --path_glob "app/Models/**"
 ```
 ┌──────────── Repo (git) ─────────-──┐
 │ app/… src/… package.json etc.      │
-│ pampa.codemap.json                 │
-│ .pampa/chunks/*.gz(.enc)          │
-│ .pampa/pampa.db (SQLite)           │
+│ pampax.codemap.json                │
+│ .pampax/chunks/*.gz(.enc)         │
+│ .pampax/pampax.db (SQLite)         │
 └────────────────────────────────────┘
           ▲       ▲
           │ write │ read
 ┌─────────┴─────────┐   │
 │ indexer.js        │   │
-│ (pampa index)     │   │
+│ (pampax index)    │   │
 └─────────▲─────────┘   │
           │ store       │ vector query
 ┌─────────┴──────────┐  │ gz fetch
@@ -513,7 +510,7 @@ pampa search "database operations" --lang php --path_glob "app/Models/**"
           │ read        │
 ┌─────────┴──────────┐  │
 │ mcp-server.js      │◄─┘
-│ (pampa mcp)        │
+│ (pampax mcp)       │
 └────────────────────┘
 ```
 
@@ -540,8 +537,8 @@ Search code semantically in the indexed project.
     -   `query` (string) - Semantic search query (e.g., "authentication function", "error handling")
     -   `limit` (number, optional) - Maximum number of results to return (default: 10)
     -   `provider` (string, optional) - Embedding provider (default: "auto")
-    -   `path` (string, optional) - **PROJECT ROOT** directory path where PAMPA database is located
--   **Database Location**: `{path}/.pampa/pampa.db`
+    -   `path` (string, optional) - **PROJECT ROOT** directory path where PAMPAX database is located
+-   **Database Location**: `{path}/.pampax/pampax.db`
 -   **Returns**: List of matching code chunks with similarity scores and SHAs
 
 ### `get_code_chunk`
@@ -551,7 +548,7 @@ Get complete code of a specific chunk.
 -   **Parameters**:
     -   `sha` (string) - SHA of the code chunk to retrieve (obtained from search_code results)
     -   `path` (string, optional) - **PROJECT ROOT** directory path (same as used in search_code)
--   **Chunk Location**: `{path}/.pampa/chunks/{sha}.gz` or `{sha}.gz.enc`
+-   **Chunk Location**: `{path}/.pampax/chunks/{sha}.gz` or `{sha}.gz.enc`
 -   **Returns**: Complete source code
 
 ### `index_project`
@@ -559,12 +556,12 @@ Get complete code of a specific chunk.
 Index a project from the agent.
 
 -   **Parameters**:
-    -   `path` (string, optional) - **PROJECT ROOT** directory path to index (will create .pampa/ subdirectory here)
+    -   `path` (string, optional) - **PROJECT ROOT** directory path to index (will create .pampax/ subdirectory here)
     -   `provider` (string, optional) - Embedding provider (default: "auto")
 -   **Creates**:
-    -   `{path}/.pampa/pampa.db` (SQLite database with embeddings)
-    -   `{path}/.pampa/chunks/` (compressed code chunks)
-    -   `{path}/pampa.codemap.json` (lightweight index for version control)
+    -   `{path}/.pampax/pampax.db` (SQLite database with embeddings)
+    -   `{path}/.pampax/chunks/` (compressed code chunks)
+    -   `{path}/pampax.codemap.json` (lightweight index for version control)
 -   **Effect**: Updates database and codemap
 
 ### `update_project`
@@ -595,17 +592,17 @@ Update project index after code changes (recommended workflow tool).
 Get indexed project statistics.
 
 -   **Parameters**:
-    -   `path` (string, optional) - **PROJECT ROOT** directory path where PAMPA database is located
--   **Database Location**: `{path}/.pampa/pampa.db`
+    -   `path` (string, optional) - **PROJECT ROOT** directory path where PAMPAX database is located
+-   **Database Location**: `{path}/.pampax/pampax.db`
 -   **Returns**: Statistics by language and file
 
 ## 📊 Available MCP Resources
 
-### `pampa://codemap`
+### `pampax://codemap`
 
 Access to the complete project code map.
 
-### `pampa://overview`
+### `pampax://overview`
 
 Summary of the project's main functions.
 
@@ -622,7 +619,7 @@ Template for finding existing similar functions.
 ## 🔍 How Retrieval Works
 
 -   **Vector search** – Cosine similarity with advanced high-dimensional embeddings
--   **Summary fallback** – If an agent sends an empty query, PAMPA returns top-level summaries so the agent understands the territory
+-   **Summary fallback** – If an agent sends an empty query, PAMPAX returns top-level summaries so the agent understands the territory
 -   **Chunk granularity** – Default = function/method/class. Adjustable per language
 
 ## 📝 Design Decisions
@@ -633,7 +630,7 @@ Template for finding existing similar functions.
 -   **Chunk granularity** → Default = function/method/class. Adjustable per language
 -   **Read-only by default** → Server only exposes read methods. Writing is done via CLI
 
-## 🧩 Extending PAMPA
+## 🧩 Extending PAMPAX
 
 | Idea                  | Hint                                                                                      |
 | --------------------- | ----------------------------------------------------------------------------------------- |
@@ -644,21 +641,21 @@ Template for finding existing similar functions.
 
 ## 🔐 Encrypting the Chunk Store
 
-PAMPA can encrypt chunk bodies at rest using AES-256-GCM. Configure it like this:
+PAMPAX can encrypt chunk bodies at rest using AES-256-GCM. Configure it like this:
 
 1. Export a 32-byte key in base64 or hex form:
 
     ```bash
-    export PAMPA_ENCRYPTION_KEY="$(openssl rand -base64 32)"
+    export PAMPAX_ENCRYPTION_KEY="$(openssl rand -base64 32)"
     ```
 
 2. Index with encryption enabled (skips plaintext writes even if stale files exist):
 
     ```bash
-    npx pampa index --encrypt on
+    npx pampax index --encrypt on
     ```
 
-    Without `--encrypt`, PAMPA auto-encrypts when the environment key is present. Use `--encrypt off` to force plaintext (e.g., for debugging).
+    Without `--encrypt`, PAMPAX auto-encrypts when the environment key is present. Use `--encrypt off` to force plaintext (e.g., for debugging).
 
 3. All new chunks are stored as `.gz.enc` and require the same key for CLI or MCP chunk retrieval. Missing or corrupt keys surface clear errors instead of leaking data.
 
@@ -667,7 +664,7 @@ Existing plaintext archives remain readable, so you can enable encryption increm
 ## 🤝 Contributing
 
 1. **Fork** → create feature branch (`feat/...`)
-2. **Run** `npm test` (coming soon) & `npx pampa index` before PR
+2. **Run** `npm test` (coming soon) & `npx pampax index` before PR
 3. **Open PR** with context: why + screenshots/logs
 
 All discussions on GitHub Issues.
@@ -680,4 +677,4 @@ Happy hacking! 💙
 
 ---
 
-🇦🇷 **Made with ❤️ in Argentina** | 🇦🇷 **Hecho con ❤️ en Argentina**
+🇦🇷 **Originally Made with ❤️ in Argentina** | 🇦🇷 **Hecho con ❤️ en Argentina**

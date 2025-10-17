@@ -18,7 +18,7 @@ try {
 }
 
 test('cross-encoder reranker mock mode sorts by score hints', async () => {
-    process.env.PAMPA_MOCK_RERANKER_TESTS = '1';
+    process.env.PAMPAX_MOCK_RERANKER_TESTS = '1';
     const rerankerModule = await import('../src/ranking/crossEncoderReranker.js');
     const { rerankCrossEncoder, __resetForTests } = rerankerModule;
     __resetForTests();
@@ -43,7 +43,7 @@ test('cross-encoder reranker mock mode sorts by score hints', async () => {
     assert.equal(reranked[0].rerankerScore, 0.9);
 
     __resetForTests();
-    delete process.env.PAMPA_MOCK_RERANKER_TESTS;
+    delete process.env.PAMPAX_MOCK_RERANKER_TESTS;
 });
 
 if (!sqliteAvailable) {

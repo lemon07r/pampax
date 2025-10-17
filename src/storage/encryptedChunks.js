@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import zlib from 'zlib';
 
-const KEY_ENV_VAR = 'PAMPA_ENCRYPTION_KEY';
+const KEY_ENV_VAR = 'PAMPAX_ENCRYPTION_KEY';
 const MAGIC_HEADER = Buffer.from('PAMPAE1', 'utf8');
 const SALT_LENGTH = 16;
 const IV_LENGTH = 12;
@@ -110,7 +110,7 @@ export function resolveEncryptionPreference({ mode, logger = console } = {}) {
     if (!key) {
         const keyError = getEncryptionKeyError();
         if (normalizedMode === 'on') {
-            throw keyError || new Error('PAMPA_ENCRYPTION_KEY is not configured but encryption was requested (--encrypt on).');
+            throw keyError || new Error('PAMPAX_ENCRYPTION_KEY is not configured but encryption was requested (--encrypt on).');
         }
         if (keyError && !warnedInvalidKey && logger && typeof logger.warn === 'function') {
             logger.warn(`${keyError.message} Encryption disabled.`);
@@ -210,7 +210,7 @@ export function readChunkFromDisk({ chunkDir, sha, key = getActiveEncryptionKey(
 
     if (fs.existsSync(encryptedPath)) {
         if (!key) {
-            const error = new Error(`Chunk ${sha} is encrypted and no PAMPA_ENCRYPTION_KEY is configured.`);
+            const error = new Error(`Chunk ${sha} is encrypted and no PAMPAX_ENCRYPTION_KEY is configured.`);
             error.code = 'ENCRYPTION_KEY_REQUIRED';
             throw error;
         }

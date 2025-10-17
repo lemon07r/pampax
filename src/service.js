@@ -160,7 +160,7 @@ let globalContext = {
 const bm25IndexCache = new Map();
 const chunkTextCache = new Map();
 
-const envRerankMax = Number.parseInt(process.env.PAMPA_RERANKER_MAX || '50', 10);
+const envRerankMax = Number.parseInt(process.env.PAMPAX_RERANKER_MAX || '50', 10);
 const RERANKER_MAX_CANDIDATES = Number.isFinite(envRerankMax) && envRerankMax > 0 ? envRerankMax : 50;
 const RERANKER_SCORE_HINT_REGEX = /mockScore:([+-]?\d+(?:\.\d+)?)/i;
 
@@ -1726,7 +1726,7 @@ export async function getChunk(sha, workingPath = '.') {
         if (error && error.code === 'ENCRYPTION_KEY_REQUIRED') {
             return {
                 success: false,
-                error: `Chunk ${sha} is encrypted. Configure PAMPA_ENCRYPTION_KEY to decrypt.`
+                error: `Chunk ${sha} is encrypted. Configure PAMPAX_ENCRYPTION_KEY to decrypt.`
             };
         }
         return { success: false, error: error.message };
