@@ -166,16 +166,28 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 {
 	"mcpServers": {
 		"pampax": {
+			"command": "npx",
+			"args": ["-y", "pampax", "mcp"]
+		}
+	}
+}
+```
+
+**Note**: Using `npx` automatically downloads and runs the latest version from npm, no global installation needed.
+
+**Optional**: Add `"--debug"` to args for detailed logging: `["-y", "pampax", "mcp", "--debug"]`
+
+**Alternative (if globally installed):**
+```json
+{
+	"mcpServers": {
+		"pampax": {
 			"command": "pampax",
 			"args": ["mcp"]
 		}
 	}
 }
 ```
-
-**Note**: After installing from GitHub with `npm install -g git+https://github.com/lemon07r/pampax.git`, the `pampax` command will be available globally.
-
-**Optional**: Add `"--debug"` to args for detailed logging: `["mcp", "--debug"]`
 
 #### Cursor
 
@@ -226,11 +238,20 @@ For direct terminal usage or manual project indexing:
 ### Install the CLI
 
 ```bash
-# Install globally from GitHub (requires Node.js 20+)
-npm install -g git+https://github.com/lemon07r/pampax.git
+# Install globally from npm (requires Node.js 16+)
+npm install -g pampax
 
 # Verify installation
 pampax --help
+```
+
+**Alternative installations:**
+```bash
+# Install from GitHub (latest development version)
+npm install -g git+https://github.com/lemon07r/pampax.git
+
+# Use npx (no global installation required)
+npx pampax index
 ```
 
 ### Index or update a project

@@ -104,3 +104,6 @@ test/test-implementations/*
 # pampa.codemap.json - ¡IMPORTANTE: NO ignorar este archivo! 
 
 .history
+
+.npmignore
+PUBLISHING.md

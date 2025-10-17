@@ -17,12 +17,13 @@
     "sourceMap": true
   },
   "include": [
-    "*.ts",
-    "*.js"
+    "src/**/*.ts",
+    "src/**/*.js"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "example"
+    "test",
+    "examples"
   ]
 } 

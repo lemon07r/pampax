@@ -12,8 +12,8 @@
 {
 	"mcpServers": {
 		"pampax": {
-			"command": "pampax",
-			"args": ["mcp"],
+			"command": "npx",
+			"args": ["-y", "pampax", "mcp"],
 			"env": {
 				"OPENAI_API_KEY": "optional-but-recommended"
 			}
@@ -22,7 +22,17 @@
 }
 ```
 
-**Note**: After installing from GitHub with `npm install -g git+https://github.com/lemon07r/pampax.git`, the `pampax` command will be available globally.
+**Note**: Using `npx` automatically downloads and runs the latest version from npm, no installation needed!
+
+**Optional - Install globally (if preferred):**
+```bash
+# Install from npm
+npm install -g pampax
+
+# Then use direct command in MCP config
+"command": "pampax",
+"args": ["mcp"]
+```
 
 **Configuration locations:**
 
@@ -37,8 +47,8 @@
 {
 	"mcpServers": {
 		"pampax": {
-			"command": "pampax",
-			"args": ["mcp"],
+			"command": "npx",
+			"args": ["-y", "pampax", "mcp"],
 			"env": {
 				"OPENAI_API_KEY": "your-api-key",
 				"OPENAI_BASE_URL": "http://localhost:1234/v1"
@@ -65,8 +75,8 @@ You can configure which embedding model to use by adding environment variables t
 {
 	"mcpServers": {
 		"pampax": {
-			"command": "pampax",
-			"args": ["mcp"],
+			"command": "npx",
+			"args": ["-y", "pampax", "mcp"],
 			"env": {
 				"OPENAI_API_KEY": "your-api-key",
 				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
@@ -83,8 +93,8 @@ You can configure which embedding model to use by adding environment variables t
 {
 	"mcpServers": {
 		"pampax": {
-			"command": "pampax",
-			"args": ["mcp"],
+			"command": "npx",
+			"args": ["-y", "pampax", "mcp"],
 			"env": {
 				"OPENAI_API_KEY": "your-api-key",
 				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
