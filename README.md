@@ -1,6 +1,6 @@
 # PAMPAX – Protocol for Augmented Memory of Project Artifacts Extended
 
-This fork adds native support for any OpenAI compatible API endpoints (so use any provider), and support for any Reranking models instead of only supporting the previous local-only Transform.js implementation. This should open up better performing model options both for emebedding and reranking.
+This fork adds native support for any OpenAI compatible API endpoints (so use any provider, or local api like llama.cpp server/lmstudio/etc), and support for any Reranking models instead of only supporting the previous local-only Transform.js implementation. This should open up better performing model options both for emebedding and reranking.
 
 **Version 1.12.x** · **Semantic Search** · **MCP Compatible** · **Node.js**
 
