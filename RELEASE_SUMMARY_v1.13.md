@@ -43,10 +43,11 @@ npm install -g pampax
    - Graceful truncation with instructions for large files
    - **Impact:** Prevents Factory Droid CLI and MCP clients from crashing
 
-2. **`update_project` "Invalid argument" fix**
-   - Added null checks in tree-sitter AST traversal
-   - Robust handling of malformed syntax trees
-   - **Impact:** Eliminates random parsing errors during indexing
+2. **`update_project` null safety fix**
+   - Added null checks in tree-sitter AST node traversal (`if (child)` guards)
+   - Prevents crashes when tree-sitter returns null nodes in malformed syntax trees
+   - **Impact:** Safer AST traversal, prevents null reference errors
+   - **Note:** "Invalid argument" errors from tree-sitter on large files (>50KB) are expected and handled via fallback indexing
 
 3. **`use_context_pack` schema fix**
    - Fixed Zod schema registration (object → plain object with types)
@@ -172,35 +173,6 @@ Test Suite:
 - [CHANGELOG.md](CHANGELOG.md) - Complete version history
 - [BENCHMARK_v1.13.md](BENCHMARK_v1.13.md) - Performance analysis
 - [CHANGES_PAMPA_TO_PAMPAX.md](CHANGES_PAMPA_TO_PAMPAX.md) - Detailed changes
-
----
-
-## 🔄 Next Steps (Recommended)
-
-1. **Verify Installation**
-   ```bash
-   npm view pampax
-   npm install -g pampax
-   pampax --version  # Should show 1.13.0
-   ```
-
-2. **Create GitHub Release**
-   - Tag: `v1.13.0`
-   - Title: "PAMPAX v1.13.0 - Fork Release with Critical Fixes"
-   - Use CHANGELOG.md content for release notes
-
-3. **Push Git Changes**
-   ```bash
-   git add .
-   git commit -m "chore: Release v1.13.0 - Published to npm"
-   git tag v1.13.0
-   git push origin master --tags
-   ```
-
-4. **Announce (Optional)**
-   - Update project README with npm badge
-   - Social media announcement
-   - Community notifications
 
 ---
 

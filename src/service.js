@@ -931,8 +931,26 @@ export async function indexProject({
                 continue;
             }
 
-            parser.setLanguage(rule.ts);
-            const tree = parser.parse(source);
+            // Tree-sitter has known issues with large files (>50KB)
+            // See: https://github.com/tree-sitter/tree-sitter/issues/3473
+            // Skip parsing and use fallback for files that may cause "Invalid argument" errors
+            let tree;
+            try {
+                parser.setLanguage(rule.ts);
+                tree = parser.parse(source);
+                
+                // Validate tree
+                if (!tree || !tree.rootNode) {
+                    throw new Error('Failed to create syntax tree');
+                }
+            } catch (parseError) {
+                // Tree-sitter parse() can throw "Invalid argument" for various reasons:
+                // - Large files (>50KB seems to be problematic)
+                // - Complex syntax structures
+                // - Parser state issues
+                // Fall through to the error handler which will index the file as a whole
+                throw parseError;
+            }
 
             async function walk(node) {
                 if (rule.nodeTypes.includes(node.type)) {

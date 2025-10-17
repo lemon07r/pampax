@@ -1,6 +1,6 @@
 {
 	"name": "pampax",
-	"version": "1.13.0",
+	"version": "1.13.1",
 	"description": "PAMPAX – Protocol for Augmented Memory of Project Artifacts Extended (MCP compatible)",
 	"author": "Lamim",
 	"type": "module",
