@@ -174,7 +174,7 @@ PAMPAX can index and search code in 21 languages out of the box:
 -   **JSON** (`.json`) ⭐ _NEW_
 
 ### Shell
--   **Bash** (`.sh`, `.bash`)
+-   **Bash** (`.sh`, `.bash`) ⭐ _NEW_
 
 ## 🆕 What's New in v1.14 - Token-Based Chunking
 
