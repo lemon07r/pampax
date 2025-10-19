@@ -34,6 +34,267 @@ export function __resetTestProviderFactory() {
 }
 
 // ============================================================================
+// TOKEN COUNTERS - For accurate token-based chunking
+// ============================================================================
+
+let tiktokenEncoder = null;
+let transformersTokenizers = new Map();
+
+async function getTokenCounter(modelName) {
+    // OpenAI models: use tiktoken
+    if (modelName.includes('text-embedding') || modelName.includes('ada-002')) {
+        if (!tiktokenEncoder) {
+            try {
+                const tiktoken = await import('tiktoken');
+                tiktokenEncoder = tiktoken.encoding_for_model('text-embedding-3-large');
+            } catch (error) {
+                console.warn('tiktoken not available, falling back to character estimation');
+                return null;
+            }
+        }
+        return (text) => tiktokenEncoder.encode(text).length;
+    }
+    
+    // Transformers.js: use model's tokenizer
+    if (modelName.includes('Xenova/')) {
+        if (!transformersTokenizers.has(modelName)) {
+            try {
+                const { AutoTokenizer } = await import('@xenova/transformers');
+                const tokenizer = await AutoTokenizer.from_pretrained(modelName);
+                transformersTokenizers.set(modelName, tokenizer);
+            } catch (error) {
+                console.warn(`Transformers tokenizer not available for ${modelName}, falling back to estimation`);
+                return null;
+            }
+        }
+        const tokenizer = transformersTokenizers.get(modelName);
+        return async (text) => {
+            const encoded = await tokenizer.encode(text);
+            return encoded.length;
+        };
+    }
+    
+    // Fallback: estimate tokens from characters (4:1 ratio for code)
+    return (text) => Math.ceil(text.length / 4);
+}
+
+// ============================================================================
+// MODEL PROFILES - Token limits and optimal chunking sizes
+// ============================================================================
+
+export const MODEL_PROFILES = {
+    // OpenAI models
+    'text-embedding-3-large': {
+        maxTokens: 8191,
+        optimalTokens: 1800,
+        minChunkTokens: 100,
+        maxChunkTokens: 2000,
+        overlapTokens: 50,
+        optimalChars: 7000,
+        minChunkChars: 400,
+        maxChunkChars: 8000,
+        overlapChars: 200,
+        dimensions: 3072,
+        useTokens: true,
+        tokenizerType: 'tiktoken',
+        encoding: 'cl100k_base'
+    },
+    'text-embedding-3-small': {
+        maxTokens: 8191,
+        optimalTokens: 1800,
+        minChunkTokens: 100,
+        maxChunkTokens: 2000,
+        overlapTokens: 50,
+        optimalChars: 7000,
+        minChunkChars: 400,
+        maxChunkChars: 8000,
+        overlapChars: 200,
+        dimensions: 1536,
+        useTokens: true,
+        tokenizerType: 'tiktoken',
+        encoding: 'cl100k_base'
+    },
+    'text-embedding-ada-002': {
+        maxTokens: 8191,
+        optimalTokens: 1800,
+        minChunkTokens: 100,
+        maxChunkTokens: 2000,
+        overlapTokens: 50,
+        optimalChars: 7000,
+        minChunkChars: 400,
+        maxChunkChars: 8000,
+        overlapChars: 200,
+        dimensions: 1536,
+        useTokens: true,
+        tokenizerType: 'tiktoken',
+        encoding: 'cl100k_base'
+    },
+    
+    // Transformers.js models (local)
+    'Xenova/all-MiniLM-L6-v2': {
+        maxTokens: 256,
+        optimalTokens: 220,
+        minChunkTokens: 50,
+        maxChunkTokens: 240,
+        overlapTokens: 20,
+        optimalChars: 880,
+        minChunkChars: 200,
+        maxChunkChars: 960,
+        overlapChars: 80,
+        dimensions: 384,
+        useTokens: true,
+        tokenizerType: 'transformers',
+        modelName: 'Xenova/all-MiniLM-L6-v2'
+    },
+    'Xenova/all-mpnet-base-v2': {
+        maxTokens: 384,
+        optimalTokens: 340,
+        minChunkTokens: 75,
+        maxChunkTokens: 360,
+        overlapTokens: 30,
+        optimalChars: 1360,
+        minChunkChars: 300,
+        maxChunkChars: 1440,
+        overlapChars: 120,
+        dimensions: 768,
+        useTokens: true,
+        tokenizerType: 'transformers',
+        modelName: 'Xenova/all-mpnet-base-v2'
+    },
+    
+    // Ollama models (use tiktoken for compatibility)
+    'nomic-embed-text': {
+        maxTokens: 8192,
+        optimalTokens: 1800,
+        minChunkTokens: 100,
+        maxChunkTokens: 2000,
+        overlapTokens: 50,
+        optimalChars: 7000,
+        minChunkChars: 400,
+        maxChunkChars: 8000,
+        overlapChars: 200,
+        dimensions: 768,
+        useTokens: true,
+        tokenizerType: 'tiktoken',
+        encoding: 'cl100k_base'
+    },
+    
+    // Cohere models
+    'embed-english-v3.0': {
+        maxTokens: 512,
+        optimalTokens: 450,
+        minChunkTokens: 75,
+        maxChunkTokens: 480,
+        overlapTokens: 30,
+        optimalChars: 1800,
+        minChunkChars: 300,
+        maxChunkChars: 1920,
+        overlapChars: 120,
+        dimensions: 1024,
+        useTokens: false,
+        tokenizerType: 'estimate'
+    },
+    
+    // Default fallback (conservative)
+    'default': {
+        maxTokens: 512,
+        optimalTokens: 400,
+        minChunkTokens: 50,
+        maxChunkTokens: 480,
+        overlapTokens: 30,
+        optimalChars: 1600,
+        minChunkChars: 200,
+        maxChunkChars: 1920,
+        overlapChars: 120,
+        dimensions: 384,
+        useTokens: false,
+        tokenizerType: 'estimate'
+    }
+};
+
+export async function getModelProfile(providerName, modelName) {
+    // Try exact model match
+    let profile = MODEL_PROFILES[modelName];
+    
+    // If no exact match, try provider defaults
+    if (!profile) {
+        const providerDefaults = {
+            'OpenAI': MODEL_PROFILES['text-embedding-3-large'],
+            'Transformers.js (Local)': MODEL_PROFILES['Xenova/all-MiniLM-L6-v2'],
+            'Ollama': MODEL_PROFILES['nomic-embed-text'],
+            'Cohere': MODEL_PROFILES['embed-english-v3.0']
+        };
+        profile = providerDefaults[providerName] || MODEL_PROFILES['default'];
+    }
+    
+    // Clone profile to avoid modifying original
+    profile = { ...profile };
+    
+    // Apply environment variable overrides
+    if (process.env.PAMPAX_MAX_TOKENS) {
+        const maxTokens = parseInt(process.env.PAMPAX_MAX_TOKENS, 10);
+        if (!isNaN(maxTokens) && maxTokens > 0) {
+            profile.maxTokens = maxTokens;
+            profile.maxChunkTokens = Math.min(profile.maxChunkTokens, maxTokens);
+            profile.optimalTokens = Math.min(profile.optimalTokens, Math.floor(maxTokens * 0.9));
+            console.log(`Using custom max tokens: ${maxTokens}`);
+        }
+    }
+    
+    if (process.env.PAMPAX_DIMENSIONS) {
+        const dimensions = parseInt(process.env.PAMPAX_DIMENSIONS, 10);
+        if (!isNaN(dimensions) && dimensions > 0) {
+            profile.dimensions = dimensions;
+            console.log(`Using custom dimensions: ${dimensions}`);
+        }
+    }
+    
+    // Attach token counter if supported
+    if (profile.useTokens) {
+        profile.tokenCounter = await getTokenCounter(modelName);
+        
+        // If token counter failed, fall back to character mode
+        if (!profile.tokenCounter) {
+            console.warn(`Token counter unavailable for ${modelName}, using character estimation`);
+            profile.useTokens = false;
+        }
+    }
+    
+    return profile;
+}
+
+// Helper: Count tokens or estimate from characters
+export function countChunkSize(text, profile) {
+    if (profile.useTokens && profile.tokenCounter) {
+        const result = profile.tokenCounter(text);
+        // Handle async tokenizers
+        return result instanceof Promise ? result : Promise.resolve(result);
+    }
+    // Fallback: character count
+    return Promise.resolve(text.length);
+}
+
+// Helper: Get the appropriate size limits based on mode
+export function getSizeLimits(profile) {
+    if (profile.useTokens && profile.tokenCounter) {
+        return {
+            optimal: profile.optimalTokens,
+            min: profile.minChunkTokens,
+            max: profile.maxChunkTokens,
+            overlap: profile.overlapTokens,
+            unit: 'tokens'
+        };
+    }
+    return {
+        optimal: profile.optimalChars,
+        min: profile.minChunkChars,
+        max: profile.maxChunkChars,
+        overlap: profile.overlapChars,
+        unit: 'characters'
+    };
+}
+
+// ============================================================================
 // OPENAI PROVIDER
 // ============================================================================
 
@@ -72,19 +333,38 @@ export class OpenAIProvider extends EmbeddingProvider {
 
     async generateEmbedding(text) {
         await this.init();
+        
+        // Get model profile for accurate limits
+        const profile = await getModelProfile(this.getName(), this.model);
+        const limits = getSizeLimits(profile);
+        const maxChars = profile.maxChunkChars || 8000;
+        
         const { data } = await this.openai.embeddings.create({
             model: this.model,
-            input: text.slice(0, 8192)
+            input: text.slice(0, maxChars)
         });
         return data[0].embedding;
     }
 
     getDimensions() {
-        return 3072; // text-embedding-3-large
+        // Check for custom dimensions
+        if (process.env.PAMPAX_DIMENSIONS) {
+            const dims = parseInt(process.env.PAMPAX_DIMENSIONS, 10);
+            if (!isNaN(dims) && dims > 0) return dims;
+        }
+        
+        // Model-specific dimensions
+        if (this.model.includes('3-small')) return 1536;
+        if (this.model.includes('3-large')) return 3072;
+        return 1536; // ada-002 default
     }
 
     getName() {
         return 'OpenAI';
+    }
+    
+    getModelName() {
+        return this.model;
     }
 }
 
@@ -118,7 +398,12 @@ export class TransformersProvider extends EmbeddingProvider {
         if (!this.initialized) {
             await this.init();
         }
-        const result = await this.pipeline(text.slice(0, 512), {
+        
+        // Get model profile for accurate limits
+        const profile = await getModelProfile(this.getName(), this.model);
+        const maxChars = profile.maxChunkChars || 960;
+        
+        const result = await this.pipeline(text.slice(0, maxChars), {
             pooling: 'mean',
             normalize: true
         });
@@ -126,11 +411,24 @@ export class TransformersProvider extends EmbeddingProvider {
     }
 
     getDimensions() {
-        return 384; // all-MiniLM-L6-v2
+        // Check for custom dimensions
+        if (process.env.PAMPAX_DIMENSIONS) {
+            const dims = parseInt(process.env.PAMPAX_DIMENSIONS, 10);
+            if (!isNaN(dims) && dims > 0) return dims;
+        }
+        
+        // Model-specific dimensions
+        if (this.model.includes('mpnet')) return 768;
+        if (this.model.includes('MiniLM')) return 384;
+        return 384; // default
     }
 
     getName() {
         return 'Transformers.js (Local)';
+    }
+    
+    getModelName() {
+        return this.model;
     }
 }
 
@@ -158,19 +456,34 @@ export class OllamaProvider extends EmbeddingProvider {
 
     async generateEmbedding(text) {
         await this.init();
+        
+        // Get model profile for accurate limits
+        const profile = await getModelProfile('Ollama', this.model);
+        const maxChars = profile.maxChunkChars || 8000;
+        
         const response = await this.ollama.embeddings({
             model: this.model,
-            prompt: text.slice(0, 2048)
+            prompt: text.slice(0, maxChars)
         });
         return response.embedding;
     }
 
     getDimensions() {
+        // Check for custom dimensions
+        if (process.env.PAMPAX_DIMENSIONS) {
+            const dims = parseInt(process.env.PAMPAX_DIMENSIONS, 10);
+            if (!isNaN(dims) && dims > 0) return dims;
+        }
+        
         return 768; // nomic-embed-text (may vary by model)
     }
 
     getName() {
-        return `Ollama (${this.model})`;
+        return `Ollama`;
+    }
+    
+    getModelName() {
+        return this.model;
     }
 }
 
@@ -202,8 +515,13 @@ export class CohereProvider extends EmbeddingProvider {
 
     async generateEmbedding(text) {
         await this.init();
+        
+        // Get model profile for accurate limits
+        const profile = await getModelProfile(this.getName(), this.model);
+        const maxChars = profile.maxChunkChars || 1920;
+        
         const response = await this.cohere.embed({
-            texts: [text.slice(0, 4096)],
+            texts: [text.slice(0, maxChars)],
             model: this.model,
             inputType: 'search_document'
         });
@@ -211,11 +529,21 @@ export class CohereProvider extends EmbeddingProvider {
     }
 
     getDimensions() {
+        // Check for custom dimensions
+        if (process.env.PAMPAX_DIMENSIONS) {
+            const dims = parseInt(process.env.PAMPAX_DIMENSIONS, 10);
+            if (!isNaN(dims) && dims > 0) return dims;
+        }
+        
         return 1024; // embed-english-v3.0
     }
 
     getName() {
         return 'Cohere';
+    }
+    
+    getModelName() {
+        return this.model;
     }
 }
 

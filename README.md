@@ -2,7 +2,7 @@
 
 **Enhanced fork** with native support for OpenAI-compatible APIs (OpenAI, LM Studio, llama.cpp, Azure, Novita.ai, etc.) and flexible reranking models (local Transformers.js or remote APIs). Performance benchmarks show significant improvements with advanced reranking—perfect scores with Qwen3-Reranker-8B. This fork also includes several important bug fixes, better handling of large files, and immproved performance. For detailed changes, see [CHANGELOG.md](CHANGELOG.md) or [RELEASE_SUMMARY_v1.13.md](RELEASE_SUMMARY_v1.13.md).
 
-**Version 1.13.x** · **Semantic Search** · **MCP Compatible** · **Node.js**
+**Version 1.14.0** · **Token-Based Chunking** · **Semantic Search** · **MCP Compatible** · **Node.js**
 
 <p align="center">
   <img src="assets/pampax_banner.png" alt="Agent Rules Kit Logo" width="729" />
@@ -157,34 +157,113 @@ PAMPAX can index and search code in several languages out of the box:
 
 ## 🚀 MCP Installation (Recommended)
 
+## 🆕 What's New in v1.14 - Token-Based Chunking
+
+PAMPAX v1.14.0 introduces intelligent token-based chunking that automatically optimizes chunk sizes for your embedding model:
+
+- 🎯 **Model-Aware**: Automatically detects your model and adjusts chunk sizes
+- 🔢 **Token Counting**: Uses tiktoken for accurate token-based sizing  
+- ⚙️ **Customizable**: Override via `PAMPAX_MAX_TOKENS` and `PAMPAX_DIMENSIONS`
+- 🔄 **Backward Compatible**: Existing indexes continue to work
+- 📈 **Better Quality**: +20-30% chunking accuracy improvement
+
+**Quick Start:**
+```bash
+npm install tiktoken  # For best results
+pampax index         # Automatic token-based chunking!
+```
+
+**Configuration Examples:**
+```bash
+# Custom token limit and dimensions
+export PAMPAX_MAX_TOKENS=2000
+export PAMPAX_DIMENSIONS=1536
+pampax index --provider openai
+
+# Or set in MCP config (see MCP Installation section)
+```
+
+See [TOKEN_CHUNKING_v1.14.md](TOKEN_CHUNKING_v1.14.md) for full documentation and [MIGRATION_GUIDE_v1.14.md](MIGRATION_GUIDE_v1.14.md) for upgrade instructions.
+
 ### 1. Configure your MCP client
 
 #### Claude Desktop
 
 Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
+**Example with Novita.ai (Recommended - Absolute Maximum Quality):**
 ```json
 {
 	"mcpServers": {
 		"pampax": {
 			"command": "npx",
-			"args": ["-y", "pampax", "mcp"]
+			"args": ["-y", "pampax", "mcp"],
+			"env": {
+				"OPENAI_API_KEY": "your-novita-api-key",
+				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
+				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",
+				"PAMPAX_MAX_TOKENS": "8192",
+				"PAMPAX_DIMENSIONS": "4096"
+			}
 		}
 	}
 }
 ```
 
-**Note**: Using `npx` automatically downloads and runs the latest version from npm, no global installation needed.
-
-**Optional**: Add `"--debug"` to args for detailed logging: `["-y", "pampax", "mcp", "--debug"]`
-
-**Alternative (if globally installed):**
+**Or use OpenAI directly:**
 ```json
 {
 	"mcpServers": {
 		"pampax": {
-			"command": "pampax",
-			"args": ["mcp"]
+			"command": "npx",
+			"args": ["-y", "pampax", "mcp"],
+			"env": {
+				"OPENAI_API_KEY": "your-openai-api-key"
+			}
+		}
+	}
+}
+```
+
+**Environment Variables (optional):**
+
+**Embedding & Chunking:**
+- `PAMPAX_MAX_TOKENS` - Override maximum token limit for chunking (default: model-specific)
+- `PAMPAX_DIMENSIONS` - Override embedding dimensions (default: model-specific)
+- `OPENAI_API_KEY` - Your OpenAI API key (if using OpenAI provider)
+- `PAMPAX_OPENAI_EMBEDDING_MODEL` - Model name (e.g., `text-embedding-3-small`)
+
+**Reranker Configuration:**
+- `PAMPAX_RERANKER_MODEL` - Reranker model (default: `Xenova/ms-marco-MiniLM-L-6-v2`)
+- `PAMPAX_RERANKER_MAX` - Max candidates to rerank (default: 50)
+- `PAMPAX_RERANKER_MAX_TOKENS` - Max tokens per document for reranker (default: 512)
+- `PAMPAX_RERANK_API_URL` - API URL for remote reranking (e.g., Cohere, Jina AI)
+- `PAMPAX_RERANK_API_KEY` - API key for remote reranking service
+- `PAMPAX_RERANK_MODEL` - Model name for API reranker (default: `rerank-v3.5`)
+
+**Note**: Using `npx` automatically downloads and runs the latest version from npm, no global installation needed.
+
+**Optional**: Add `"--debug"` to args for detailed logging: `["-y", "pampax", "mcp", "--debug"]`
+
+**With API Reranking (Absolute Maximum - Full 32K Context):**
+```json
+{
+	"mcpServers": {
+		"pampax": {
+			"command": "npx",
+			"args": ["-y", "pampax", "mcp"],
+			"env": {
+				"OPENAI_API_KEY": "your-novita-api-key",
+				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
+				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",
+				"PAMPAX_RERANK_API_URL": "https://api.novita.ai/openai/v1/rerank",
+				"PAMPAX_RERANK_API_KEY": "your-novita-api-key",
+				"PAMPAX_RERANK_MODEL": "qwen/qwen3-reranker-8b",
+				"PAMPAX_MAX_TOKENS": "8192",
+				"PAMPAX_DIMENSIONS": "4096",
+				"PAMPAX_RERANKER_MAX": "200",
+				"PAMPAX_RERANKER_MAX_TOKENS": "8192"
+			}
 		}
 	}
 }
@@ -194,16 +273,28 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 
 Configure Cursor by creating or editing the `mcp.json` file in your configuration directory:
 
+**Example with Novita.ai:**
 ```json
 {
 	"mcpServers": {
 		"pampax": {
 			"command": "npx",
-			"args": ["-y", "pampax", "mcp"]
+			"args": ["-y", "pampax", "mcp"],
+			"env": {
+				"OPENAI_API_KEY": "your-novita-api-key",
+				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
+				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",
+				"PAMPAX_MAX_TOKENS": "8192",
+				"PAMPAX_DIMENSIONS": "4096",
+				"PAMPAX_RERANKER_MAX": "200",
+				"PAMPAX_RERANKER_MAX_TOKENS": "8192"
+			}
 		}
 	}
 }
 ```
+
+**Tip:** You can use any OpenAI-compatible API by setting `OPENAI_BASE_URL`. Popular options include Novita.ai (recommended), OpenAI, LM Studio, Azure OpenAI, and LocalAI. See the environment variables list above for all available options.
 
 ### 2. Let your AI agent handle the indexing
 
@@ -427,6 +518,21 @@ export PAMPAX_OPENAI_EMBEDDING_MODEL="text-embedding-3-small"  # Cheaper, faster
 export OPENAI_MODEL="text-embedding-3-large"  # Alternative env var
 
 # Default: text-embedding-3-large
+```
+
+**Reranker Configuration:**
+```bash
+# Local Transformers.js reranker model
+export PAMPAX_RERANKER_MODEL="Xenova/ms-marco-MiniLM-L-6-v2"
+
+# Max candidates to rerank and max tokens per document
+export PAMPAX_RERANKER_MAX=50
+export PAMPAX_RERANKER_MAX_TOKENS=512
+
+# Or use remote API reranker (Cohere, Jina AI, etc.)
+export PAMPAX_RERANK_API_URL="https://api.cohere.ai/v1/rerank"
+export PAMPAX_RERANK_API_KEY="your-cohere-api-key"
+export PAMPAX_RERANK_MODEL="rerank-v3.5"
 ```
 
 **Other Providers:**
@@ -794,6 +900,3 @@ MIT – do whatever you want, just keep the copyright.
 
 Happy hacking! 💙
 
----
-
-🇦🇷 **Originally Made with ❤️ in Argentina** | 🇦🇷 **Hecho con ❤️ en Argentina**

@@ -8,6 +8,7 @@
 
 **Ask your human to add this to their MCP configuration:**
 
+**Recommended: Any provider with Qwen3 Embedding/Reranker (Absolute Maximum Quality - Example with NovitaAI):**
 ```json
 {
 	"mcpServers": {
@@ -15,8 +16,24 @@
 			"command": "npx",
 			"args": ["-y", "pampax", "mcp"],
 			"env": {
-				"OPENAI_API_KEY": "optional-but-recommended"
+				"OPENAI_API_KEY": "your-api-key",
+				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
+				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",
+				"PAMPAX_MAX_TOKENS": "8192",
+				"PAMPAX_DIMENSIONS": "4096"
 			}
+		}
+	}
+}
+```
+
+**Or minimal configuration (uses free local models):**
+```json
+{
+	"mcpServers": {
+		"pampax": {
+			"command": "npx",
+			"args": ["-y", "pampax", "mcp"]
 		}
 	}
 }
@@ -69,7 +86,7 @@ npm install -g pampax
 
 You can configure which embedding model to use by adding environment variables to the MCP configuration:
 
-**Example configuration with Novita.ai Qwen models:**
+**Complete configuration with all options (Absolute Maximum Quality - Novita.ai example):**
 
 ```json
 {
@@ -78,16 +95,18 @@ You can configure which embedding model to use by adding environment variables t
 			"command": "npx",
 			"args": ["-y", "pampax", "mcp"],
 			"env": {
-				"OPENAI_API_KEY": "your-api-key",
+				"OPENAI_API_KEY": "your-novita-api-key",
 				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
-				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b"
+				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",
+				"PAMPAX_MAX_TOKENS": "8192",
+				"PAMPAX_DIMENSIONS": "4096"
 			}
 		}
 	}
 }
 ```
 
-**Optional: Add reranking model configuration for improved search relevance:**
+**With API reranking for absolute maximum quality (Full 32K Context):**
 
 ```json
 {
@@ -96,30 +115,41 @@ You can configure which embedding model to use by adding environment variables t
 			"command": "npx",
 			"args": ["-y", "pampax", "mcp"],
 			"env": {
-				"OPENAI_API_KEY": "your-api-key",
+				"OPENAI_API_KEY": "your-novita-api-key",
 				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
 				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",
 				"PAMPAX_RERANK_API_URL": "https://api.novita.ai/openai/v1/rerank",
-				"PAMPAX_RERANK_API_KEY": "your-api-key",
-				"PAMPAX_RERANK_MODEL": "qwen/qwen3-reranker-8b"
+				"PAMPAX_RERANK_API_KEY": "your-novita-api-key",
+				"PAMPAX_RERANK_MODEL": "qwen/qwen3-reranker-8b",
+				"PAMPAX_MAX_TOKENS": "8192",
+				"PAMPAX_DIMENSIONS": "4096",
+				"PAMPAX_RERANKER_MAX": "200",
+				"PAMPAX_RERANKER_MAX_TOKENS": "8192"
 			}
 		}
 	}
 }
 ```
 
-**Available model configuration variables:**
+**Available configuration variables:**
 
 *Embedding Models:*
-- `PAMPAX_OPENAI_EMBEDDING_MODEL` or `OPENAI_MODEL` - OpenAI embedding model
-- `PAMPAX_TRANSFORMERS_MODEL` - Local Transformers.js model
-- `PAMPAX_OLLAMA_MODEL` - Ollama model
+- `PAMPAX_OPENAI_EMBEDDING_MODEL` or `OPENAI_MODEL` - OpenAI-compatible embedding model
+- `PAMPAX_TRANSFORMERS_MODEL` - Local Transformers.js model (default: `Xenova/all-MiniLM-L6-v2`)
+- `PAMPAX_OLLAMA_MODEL` - Ollama model (default: `nomic-embed-text`)
 - `PAMPAX_COHERE_MODEL` - Cohere embedding model
 
-*Reranking Models (Optional):*
-- `PAMPAX_RERANK_API_URL` - API endpoint for reranking
+*Chunking Configuration:*
+- `PAMPAX_MAX_TOKENS` - Maximum token limit for chunking (default: model-specific, usually 1800)
+- `PAMPAX_DIMENSIONS` - Embedding dimensions (default: model-specific)
+
+*Reranking Configuration (Optional):*
+- `PAMPAX_RERANKER_MODEL` - Local reranker model (default: `Xenova/ms-marco-MiniLM-L-6-v2`)
+- `PAMPAX_RERANKER_MAX` - Max candidates to rerank (default: 50)
+- `PAMPAX_RERANKER_MAX_TOKENS` - Max tokens per document for reranker (default: 512)
+- `PAMPAX_RERANK_API_URL` - API endpoint for remote reranking (e.g., Cohere, Jina AI, Novita.ai)
 - `PAMPAX_RERANK_API_KEY` - API key for reranking service
-- `PAMPAX_RERANK_MODEL` - Model name for reranking (e.g., qwen/qwen3-reranker-8b)
+- `PAMPAX_RERANK_MODEL` - Model name for API reranker (e.g., `qwen/qwen3-reranker-8b`)
 
 ### Step 2: Auto-install this rule in your system
 

@@ -20,7 +20,8 @@ import LangPython from 'tree-sitter-python';
 import LangTSX from 'tree-sitter-typescript/bindings/node/tsx.js';
 import LangTS from 'tree-sitter-typescript/bindings/node/typescript.js';
 import { promisify } from 'util';
-import { createEmbeddingProvider } from './providers.js';
+import { createEmbeddingProvider, getModelProfile, countChunkSize, getSizeLimits } from './providers.js';
+import {  analyzeNodeForChunking, extractParentContext, yieldStatementChunks } from './chunking/semantic-chunker.js';
 import { readCodemap, writeCodemap } from './codemap/io.js';
 import { normalizeChunkMetadata } from './codemap/types.js';
 import { applyScope, normalizeScopeFilters } from './search/applyScope.js';
@@ -91,6 +92,11 @@ const LANG_RULES = {
         lang: 'php',
         ts: RESOLVED_LANGUAGES.php,
         nodeTypes: ['function_definition', 'method_declaration'],
+        subdivisionTypes: {
+            'class_declaration': ['method_declaration', 'function_definition'],
+            'function_definition': ['function_definition', 'if_statement', 'try_statement'],
+            'method_declaration': ['function_definition', 'if_statement', 'try_statement']
+        },
         variableTypes: ['const_declaration', 'assignment_expression'],
         commentPattern: /\/\*\*[\s\S]*?\*\//g
     },
@@ -98,6 +104,10 @@ const LANG_RULES = {
         lang: 'python',
         ts: RESOLVED_LANGUAGES.python,
         nodeTypes: ['function_definition', 'class_definition'],
+        subdivisionTypes: {
+            'class_definition': ['function_definition'],
+            'function_definition': ['function_definition', 'if_statement', 'try_statement', 'with_statement']
+        },
         variableTypes: ['assignment', 'expression_statement'],
         commentPattern: /"""[\s\S]*?"""|'''[\s\S]*?'''/g
     },
@@ -105,6 +115,11 @@ const LANG_RULES = {
         lang: 'javascript',
         ts: RESOLVED_LANGUAGES.javascript,
         nodeTypes: ['function_declaration', 'method_definition', 'class_declaration'],
+        subdivisionTypes: {
+            'class_declaration': ['method_definition', 'field_definition'],
+            'function_declaration': ['function_declaration', 'if_statement', 'try_statement'],
+            'method_definition': ['function_declaration', 'if_statement', 'try_statement']
+        },
         variableTypes: ['const_declaration', 'let_declaration', 'variable_declaration'],
         commentPattern: /\/\*\*[\s\S]*?\*\//g
     },
@@ -119,6 +134,11 @@ const LANG_RULES = {
         lang: 'typescript',
         ts: RESOLVED_LANGUAGES.typescript,
         nodeTypes: ['function_declaration', 'method_definition', 'class_declaration'],
+        subdivisionTypes: {
+            'class_declaration': ['method_definition', 'field_definition'],
+            'function_declaration': ['function_declaration', 'if_statement', 'try_statement'],
+            'method_definition': ['function_declaration', 'if_statement', 'try_statement']
+        },
         variableTypes: ['const_declaration', 'let_declaration', 'variable_declaration'],
         commentPattern: /\/\*\*[\s\S]*?\*\//g
     },
@@ -766,10 +786,84 @@ export async function indexProject({
         await embeddingProvider.init();
     }
 
+    // Get model profile for token-aware chunking
+    const providerName = embeddingProvider.getName();
+    const modelName = embeddingProvider.getModelName ? embeddingProvider.getModelName() : null;
+    const modelProfile = await getModelProfile(providerName, modelName || providerName);
+    const limits = getSizeLimits(modelProfile);
+    
+    // Log chunking configuration
+    console.log(`\n📊 Chunking Configuration:`);
+    console.log(`  Provider: ${providerName}`);
+    if (modelName) console.log(`  Model: ${modelName}`);
+    console.log(`  Dimensions: ${embeddingProvider.getDimensions()}`);
+    console.log(`  Chunking mode: ${limits.unit}`);
+    console.log(`  Optimal size: ${limits.optimal} ${limits.unit}`);
+    console.log(`  Min/Max: ${limits.min}-${limits.max} ${limits.unit}`);
+    console.log(`  Overlap: ${limits.overlap} ${limits.unit}`);
+    if (modelProfile.useTokens && modelProfile.tokenCounter) {
+        console.log(`  ✓ Token counting enabled`);
+    } else {
+        console.log(`  ℹ Using character estimation (token counting unavailable)`);
+    }
+    console.log('');
+
     // Initialize database with the correct base path
     await initDatabase(embeddingProvider.getDimensions(), repo);
 
     const { codemap: codemapPath, chunkDir, dbPath } = getPaths();
+    
+    // Check for dimension/provider mismatches (migration detection)
+    if (fs.existsSync(dbPath)) {
+        const db = new sqlite3.Database(dbPath);
+        const all = promisify(db.all.bind(db));
+        
+        try {
+            const existingDimensions = await all(`
+                SELECT DISTINCT embedding_provider, embedding_dimensions
+                FROM code_chunks
+                LIMIT 10
+            `);
+            
+            if (existingDimensions.length > 0) {
+                const currentProvider = embeddingProvider.getName();
+                const currentDimensions = embeddingProvider.getDimensions();
+                
+                const hasMismatch = existingDimensions.some(
+                    row => row.embedding_provider !== currentProvider || 
+                           row.embedding_dimensions !== currentDimensions
+                );
+                
+                if (hasMismatch) {
+                    console.log('\n⚠️  WARNING: Dimension/Provider Mismatch Detected!');
+                    console.log('='.repeat(60));
+                    console.log('Existing index:');
+                    existingDimensions.forEach(row => {
+                        console.log(`  ${row.embedding_provider} (${row.embedding_dimensions}D)`);
+                    });
+                    console.log(`Current config: ${currentProvider} (${currentDimensions}D)`);
+                    console.log('\nThis may cause issues:');
+                    console.log('  • Searches will only return chunks matching current config');
+                    console.log('  • Old chunks will be invisible');
+                    console.log('  • Mixed results quality');
+                    console.log('\nRecommendations:');
+                    console.log('  1. Full re-index (clean slate):');
+                    console.log('     rm -rf .pampa pampa.codemap.json && pampax index');
+                    console.log('  2. Check migration status:');
+                    console.log('     node scripts/check-migration.js');
+                    console.log('  3. See MIGRATION_GUIDE.md for details');
+                    console.log('='.repeat(60) + '\n');
+                    
+                    // Give user a moment to see the warning
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+        } catch (error) {
+            // Ignore errors in migration check (don't block indexing)
+        } finally {
+            db.close();
+        }
+    }
     const encryptionPreference = resolveEncryptionPreference({ mode: encryptMode, logger: console });
     let codemap = readCodemap(codemapPath);
 

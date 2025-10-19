@@ -40,6 +40,33 @@ function getMaxFromEnv() {
 }
 
 /**
+ * Get max tokens per document from environment (or default)
+ */
+function getMaxTokensFromEnv() {
+    const envMax = Number.parseInt(process.env.PAMPAX_RERANKER_MAX_TOKENS || '512', 10);
+    return Number.isFinite(envMax) && envMax > 0 ? envMax : 512;
+}
+
+/**
+ * Truncate text to max tokens (rough estimate)
+ */
+function truncateText(text, maxTokens) {
+    if (!text || typeof text !== 'string') {
+        return '';
+    }
+
+    // Rough estimate: 1 token ≈ 4 characters for code
+    const maxChars = maxTokens * 4;
+    
+    if (text.length <= maxChars) {
+        return text;
+    }
+
+    // Truncate at character boundary
+    return text.slice(0, maxChars);
+}
+
+/**
  * Check if API reranking is configured
  */
 export function isAPIRerankingConfigured() {
@@ -195,6 +222,7 @@ export async function rerankWithAPI(query, candidates, options = {}) {
     }
 
     const topCandidates = candidates.slice(0, maxCandidates);
+    const maxTokens = options.maxTokens || getMaxTokensFromEnv();
 
     try {
         // Get document texts for all candidates
@@ -205,7 +233,9 @@ export async function rerankWithAPI(query, candidates, options = {}) {
                     const text = options && typeof options.getTextAsync === 'function'
                         ? await options.getTextAsync(candidate)
                         : buildCandidateText(candidate, options);
-                    return typeof text === 'string' ? text : '';
+                    const textStr = typeof text === 'string' ? text : '';
+                    // Truncate to max tokens
+                    return truncateText(textStr, maxTokens);
                 })
             );
             texts = resolvedTexts;

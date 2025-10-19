@@ -2,6 +2,7 @@ import { rerankWithAPI, isAPIRerankingConfigured } from './apiReranker.js';
 
 const DEFAULT_MODEL_ID = process.env.PAMPAX_RERANKER_MODEL || 'Xenova/ms-marco-MiniLM-L-6-v2';
 const DEFAULT_MAX_CANDIDATES = Number.parseInt(process.env.PAMPAX_RERANKER_MAX || '50', 10);
+const DEFAULT_MAX_TOKENS = Number.parseInt(process.env.PAMPAX_RERANKER_MAX_TOKENS || '512', 10);
 
 let pipelineFactory = null;
 let modelPromise = null;
@@ -20,6 +21,30 @@ function getDefaultMaxCandidates() {
     }
 
     return 50;
+}
+
+function getDefaultMaxTokens() {
+    if (Number.isFinite(DEFAULT_MAX_TOKENS) && DEFAULT_MAX_TOKENS > 0) {
+        return DEFAULT_MAX_TOKENS;
+    }
+
+    return 512;
+}
+
+function truncateText(text, maxTokens) {
+    if (!text || typeof text !== 'string') {
+        return '';
+    }
+
+    // Rough estimate: 1 token ≈ 4 characters for code
+    const maxChars = maxTokens * 4;
+    
+    if (text.length <= maxChars) {
+        return text;
+    }
+
+    // Truncate at character boundary
+    return text.slice(0, maxChars);
 }
 
 function extractScoreHint(candidate, options) {
@@ -216,6 +241,7 @@ async function rerankCrossEncoderLocal(query, candidates, options = {}) {
     }
 
     const topCandidates = candidates.slice(0, maxCandidates);
+    const maxTokens = options.maxTokens || getDefaultMaxTokens();
 
     if (shouldMock()) {
         const scored = topCandidates
@@ -243,7 +269,9 @@ async function rerankCrossEncoderLocal(query, candidates, options = {}) {
                 const text = options && typeof options.getTextAsync === 'function'
                     ? await options.getTextAsync(candidate)
                     : buildCandidateText(candidate, options);
-                return typeof text === 'string' ? text : '';
+                const textStr = typeof text === 'string' ? text : '';
+                // Truncate to max tokens
+                return truncateText(textStr, maxTokens);
             })
         );
         texts = resolvedTexts;
