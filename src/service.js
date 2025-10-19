@@ -37,7 +37,8 @@ import LangTSX from 'tree-sitter-typescript/bindings/node/tsx.js';
 import LangTS from 'tree-sitter-typescript/bindings/node/typescript.js';
 import { promisify } from 'util';
 import { createEmbeddingProvider, getModelProfile, countChunkSize, getSizeLimits } from './providers.js';
-import {  analyzeNodeForChunking, extractParentContext, yieldStatementChunks } from './chunking/semantic-chunker.js';
+import {  analyzeNodeForChunking, batchAnalyzeNodes, extractParentContext, yieldStatementChunks } from './chunking/semantic-chunker.js';
+import { getTokenCountStats } from './chunking/token-counter.js';
 import { readCodemap, writeCodemap } from './codemap/io.js';
 import { normalizeChunkMetadata } from './codemap/types.js';
 import { applyScope, normalizeScopeFilters } from './search/applyScope.js';
@@ -1389,12 +1390,21 @@ export async function indexProject({
                     // Try to subdivide into smaller semantic chunks
                     chunkingStats.subdivided++;
                     
+                    // ===== OPTIMIZATION: Batch analyze all subdivision candidates at once =====
+                    const subAnalyses = await batchAnalyzeNodes(
+                        analysis.subdivisionCandidates,
+                        source,
+                        rule,
+                        modelProfile,
+                        true  // isSubdivision = true (allows safe estimate optimizations)
+                    );
+                    
                     // Collect small chunks that will be skipped in subdivision
                     const smallChunks = [];
                     
-                    for (const subNode of analysis.subdivisionCandidates) {
-                        // Analyze each subdivision candidate
-                        const subAnalysis = await analyzeNodeForChunking(subNode, source, rule, modelProfile);
+                    for (let i = 0; i < subAnalyses.length; i++) {
+                        const subAnalysis = subAnalyses[i];
+                        const subNode = subAnalysis.node;
                         
                         if (subAnalysis.size < limits.min) {
                             // This subdivision is too small - collect it for merging
@@ -1761,6 +1771,9 @@ export async function indexProject({
     attachSymbolGraphToCodemap(codemap);
     codemap = writeCodemap(codemapPath, codemap);
 
+    // Get token counting performance stats
+    const tokenStats = getTokenCountStats();
+    
     // Log chunking statistics
     if (chunkingStats.totalNodes > 0) {
         console.log(`\n📈 Chunking Statistics:`);
@@ -1778,6 +1791,22 @@ export async function indexProject({
         console.log(`  Chunk reduction: ${reductionRatio}% fewer chunks vs naive approach`);
         console.log('');
     }
+    
+    // Log token counting performance stats (if token counting was used)
+    if (modelProfile.useTokens && tokenStats.totalRequests > 0) {
+        console.log(`⚡ Token Counting Performance:`);
+        console.log(`  Total size checks: ${tokenStats.totalRequests}`);
+        console.log(`  Character pre-filter: ${tokenStats.charFilterRate} (${tokenStats.charFilterSkips} skipped)`);
+        console.log(`  Cache hits: ${tokenStats.cacheHitRate} (${tokenStats.cacheHits} cached)`);
+        console.log(`  Actual tokenizations: ${tokenStats.actualTokenizations}`);
+        console.log(`  Batch operations: ${tokenStats.batchTokenizations}`);
+        
+        const efficiency = tokenStats.totalRequests > 0
+            ? (((tokenStats.charFilterSkips + tokenStats.cacheHits) / tokenStats.totalRequests) * 100).toFixed(1)
+            : 0;
+        console.log(`  Overall efficiency: ${efficiency}% avoided expensive tokenization`);
+        console.log('');
+    }
 
     // Return structured result
     return {
@@ -1786,7 +1815,8 @@ export async function indexProject({
         totalChunks: Object.keys(codemap).length,
         provider: embeddingProvider.getName(),
         errors,
-        chunkingStats
+        chunkingStats,
+        tokenStats: modelProfile.useTokens ? tokenStats : undefined
     };
 }
 
