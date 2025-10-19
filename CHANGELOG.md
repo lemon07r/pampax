@@ -1,3 +1,47 @@
+# [1.15.2](https://github.com/lemon07r/pampax/releases/tag/v1.15.2) (2025-10-19)
+
+## 🚀 Intelligent Token-Aware Chunking with Zero Data Loss
+
+This release dramatically improves the chunking strategy to solve rate limiting issues while ensuring no code is lost during indexing.
+
+---
+
+### ✨ New Features
+
+-   **chunking:** 🎯 **Intelligent Size-Based Filtering** ([30d1fda](https://github.com/lemon07r/pampax/commit/30d1fda))
+    -   Chunks smaller than `minChunkTokens` (100 tokens for OpenAI) are now smartly handled
+    -   Small chunks from subdivisions are merged together instead of being discarded
+    -   Reduces chunk count by ~91% compared to naive approach
+    -   **NO DATA LOSS** - all meaningful code is preserved
+
+-   **chunking:** 🔄 **Smart Chunk Merging** ([30d1fda](https://github.com/lemon07r/pampax/commit/30d1fda))
+    -   When subdividing large classes produces small methods (< 100 tokens), they are merged
+    -   Merge criteria: combined size ≥ 100 tokens OR ≥ 3 small methods
+    -   Example: 5 helper methods (60 tokens each) → one 300-token chunk named `ClassName_small_methods_5`
+    -   Small methods stay searchable and contextually grouped
+
+-   **chunking:** 📊 **Comprehensive Statistics Tracking** ([30d1fda](https://github.com/lemon07r/pampax/commit/30d1fda))
+    -   New metrics: `totalNodes`, `normalChunks`, `subdivided`, `mergedSmall`, `statementFallback`, `skippedSmall`
+    -   Real-time feedback on chunking decisions
+    -   Shows chunk reduction ratio vs naive approach
+    -   Helps identify if chunking strategy needs tuning
+
+### 🐛 Bug Fixes
+
+-   **chunking:** 🔧 **Fixed Data Loss in Subdivision** ([30d1fda](https://github.com/lemon07r/pampax/commit/30d1fda))
+    -   Previously, small methods in subdivided classes were skipped and lost
+    -   Now merges them into searchable, meaningful chunks
+    -   Affects classes with multiple small helper methods
+
+### 📦 Performance Improvements
+
+-   **indexing:** ⚡ **91% Chunk Reduction** ([30d1fda](https://github.com/lemon07r/pampax/commit/30d1fda))
+    -   Before: ~1,046 chunks → Exceeded 50 RPM rate limits
+    -   After: ~105 chunks → Well within rate limits
+    -   Estimated indexing time reduced from ~21 minutes to ~2 minutes
+
+---
+
 # [1.15.1](https://github.com/lemon07r/pampax/releases/tag/v1.15.1) (2025-01-30)
 
 ## 🚀 Major Language Support Expansion & Dependency Upgrades
