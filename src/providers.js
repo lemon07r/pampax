@@ -239,10 +239,32 @@ export async function getModelProfile(providerName, modelName) {
     if (process.env.PAMPAX_MAX_TOKENS) {
         const maxTokens = parseInt(process.env.PAMPAX_MAX_TOKENS, 10);
         if (!isNaN(maxTokens) && maxTokens > 0) {
+            // Calculate scaling ratio based on the change in max tokens
+            const originalMaxTokens = profile.maxTokens;
+            const scalingRatio = maxTokens / originalMaxTokens;
+            
+            // Apply scaling to all token-based parameters
             profile.maxTokens = maxTokens;
-            profile.maxChunkTokens = Math.min(profile.maxChunkTokens, maxTokens);
-            profile.optimalTokens = Math.min(profile.optimalTokens, Math.floor(maxTokens * 0.9));
+            
+            // Automatically scale optimal tokens (target 80-85% of max for good context)
+            profile.optimalTokens = Math.floor(maxTokens * 0.82);
+            
+            // Scale min tokens proportionally (but ensure reasonable minimum)
+            profile.minChunkTokens = Math.max(
+                Math.floor(profile.minChunkTokens * scalingRatio),
+                50  // Absolute minimum to avoid too many tiny chunks
+            );
+            
+            // Max chunk tokens should be close to max tokens (leave 5-10% headroom)
+            profile.maxChunkTokens = Math.floor(maxTokens * 0.95);
+            
+            // Scale overlap proportionally
+            profile.overlapTokens = Math.floor(profile.overlapTokens * scalingRatio);
+            
             console.log(`Using custom max tokens: ${maxTokens}`);
+            console.log(`Auto-scaled optimal tokens: ${profile.optimalTokens} (82% of max)`);
+            console.log(`Auto-scaled min tokens: ${profile.minChunkTokens}`);
+            console.log(`Auto-scaled max chunk tokens: ${profile.maxChunkTokens} (95% of max)`);
         }
     }
     

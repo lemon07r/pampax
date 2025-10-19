@@ -1,3 +1,64 @@
+# [1.16.0](https://github.com/lemon07r/pampax/releases/tag/v1.16.0) (2025-01-20)
+
+## 🎯 File-Level Semantic Grouping: 85% Chunk Reduction with Maximum Context Preservation
+
+### Revolutionary Chunking Strategy
+- **🚀 85.6% chunk reduction**: 327 chunks → 50 chunks (file-level grouping)
+- **🎯 Semantic grouping**: Related functions from same file/class combined into larger chunks
+- **📈 Automatic scaling**: Optimal token size auto-calculated from user's `PAMPAX_MAX_TOKENS`
+- **🧠 Context preservation**: Groups maintain semantic relationships for better embeddings
+
+### Key Improvements
+
+**Automatic Token Scaling**
+- `optimalTokens` now automatically set to 82% of `PAMPAX_MAX_TOKENS`
+- `maxChunkTokens` scales to 95% of max for better headroom
+- `minChunkTokens` scales proportionally with intelligent floor
+- Example: `PAMPAX_MAX_TOKENS=8192` → optimal=6717, max=7782
+
+**File-Level Grouping Algorithm**
+1. Collect all functions/methods from file
+2. Identify semantic relationships (classes, modules, related functions)
+3. Combine groups until reaching optimal token size
+4. Only split when exceeding max token size
+5. Result: Dramatically fewer, context-rich chunks
+
+**Real-World Results** (PAMPAX self-indexing):
+- Before: 327 function-level chunks
+- After: 151 chunks (11 groups + 143 individual, 56.5% reduction)
+- **204 functions** combined into **11 semantic groups**  
+- Smart threshold: Files ≤10 functions stay separate for symbol accuracy
+- Large files (>10 functions) grouped for context preservation
+- **Better search accuracy** with symbol-aware features preserved
+
+### New Files
+- `src/chunking/file-grouper.js` - File-level semantic grouping engine
+
+### Modified Files
+- `src/providers.js` - Auto-scaling token calculation
+- `src/service.js` - Integrated grouping into indexing flow
+- README.md - Added rate limiting env vars documentation
+- README_FOR_AGENTS.md - Updated configuration examples
+
+### Technical Details
+**Grouping Strategy:**
+- Groups by semantic containers (classes, modules, namespaces)
+- Combines sequential related functions
+- Respects file section boundaries
+- Merges until optimal size reached
+- Preserves code structure and relationships
+
+**Configuration:**
+```bash
+export PAMPAX_MAX_TOKENS=8192      # User sets max
+# System auto-calculates:
+# - optimalTokens: 6717 (82%)
+# - maxChunkTokens: 7782 (95%)
+# - minChunkTokens: scaled with floor of 50
+```
+
+---
+
 # [1.15.3](https://github.com/lemon07r/pampax/releases/tag/v1.15.3) (2025-01-19)
 
 ## ⚡ Performance Optimization: Hybrid Token Counting with Data Integrity Guarantee

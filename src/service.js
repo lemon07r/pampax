@@ -38,6 +38,7 @@ import LangTS from 'tree-sitter-typescript/bindings/node/typescript.js';
 import { promisify } from 'util';
 import { createEmbeddingProvider, getModelProfile, countChunkSize, getSizeLimits } from './providers.js';
 import {  analyzeNodeForChunking, batchAnalyzeNodes, extractParentContext, yieldStatementChunks } from './chunking/semantic-chunker.js';
+import { groupNodesForChunking, createCombinedChunk } from './chunking/file-grouper.js';
 import { getTokenCountStats } from './chunking/token-counter.js';
 import { readCodemap, writeCodemap } from './codemap/io.js';
 import { normalizeChunkMetadata } from './codemap/types.js';
@@ -1370,23 +1371,60 @@ export async function indexProject({
                 throw parseError;
             }
 
-            // Track processed nodes to avoid double-processing from subdivision
-            const processedNodes = new Set();
+            // ===== FILE-LEVEL GROUPING STRATEGY =====
+            // Instead of processing nodes one-by-one, collect all nodes first
+            // Then group them by semantic relationships for better context preservation
             
-            async function walk(node) {
-                // Skip if this node was already processed as part of a subdivision
-                if (processedNodes.has(node.id)) {
-                    return;
-                }
-                
+            const collectedNodes = [];
+            
+            // Collect all target nodes from the AST
+            function collectNodes(node) {
                 if (rule.nodeTypes.includes(node.type)) {
-                    await yieldChunk(node);
+                    collectedNodes.push(node);
                 }
                 for (let i = 0; i < node.childCount; i++) {
                     const child = node.child(i);
                     if (child) {
-                        await walk(child);
+                        collectNodes(child);
                     }
+                }
+            }
+            
+            // Collect all nodes first
+            collectNodes(tree.rootNode);
+            
+            // Group nodes for optimal context preservation
+            const nodeGroups = await groupNodesForChunking(
+                collectedNodes,
+                source,
+                modelProfile,
+                rule
+            );
+            
+            // Track processed nodes to avoid double-processing
+            const processedNodes = new Set();
+            
+            // Process groups instead of individual nodes
+            async function processNodeGroup(nodeGroup) {
+                // If this is a single-node group, process normally
+                if (nodeGroup.nodes.length === 1) {
+                    await yieldChunk(nodeGroup.nodes[0]);
+                    return;
+                }
+                
+                // Create combined chunk from multiple nodes
+                const combinedChunk = createCombinedChunk(nodeGroup, source, rel);
+                if (combinedChunk) {
+                    chunkingStats.totalNodes += nodeGroup.nodes.length;
+                    chunkingStats.fileGrouped = (chunkingStats.fileGrouped || 0) + 1;
+                    chunkingStats.functionsGrouped = (chunkingStats.functionsGrouped || 0) + nodeGroup.nodes.length;
+                    
+                    await processChunk(
+                        combinedChunk.node,
+                        combinedChunk.code,
+                        `group_${nodeGroup.nodes.length}funcs`,
+                        null
+                    );
                 }
             }
 
@@ -1680,7 +1718,10 @@ export async function indexProject({
                 }
             }
 
-            await walk(tree.rootNode);
+            // Process all node groups
+            for (const nodeGroup of nodeGroups) {
+                await processNodeGroup(nodeGroup);
+            }
 
             if (staleChunkIds.size > 0) {
                 await deleteChunks(Array.from(staleChunkIds), existingChunks);
@@ -1798,11 +1839,17 @@ export async function indexProject({
     if (chunkingStats.totalNodes > 0) {
         console.log(`\n📈 Chunking Statistics:`);
         console.log(`  Total AST nodes analyzed: ${chunkingStats.totalNodes}`);
-        console.log(`  Normal chunks (optimal size): ${chunkingStats.normalChunks}`);
-        console.log(`  Subdivided (too large): ${chunkingStats.subdivided}`);
-        console.log(`  Merged small chunks: ${chunkingStats.mergedSmall}`);
-        console.log(`  Statement-level fallback: ${chunkingStats.statementFallback}`);
-        console.log(`  Skipped (too small): ${chunkingStats.skippedSmall}`);
+        
+        // Show file-level grouping stats
+        if (chunkingStats.fileGrouped && chunkingStats.functionsGrouped) {
+            console.log(`  🎯 File-grouped chunks: ${chunkingStats.fileGrouped} (${chunkingStats.functionsGrouped} functions combined)`);
+        }
+        
+        console.log(`  Normal chunks (optimal size): ${chunkingStats.normalChunks || 0}`);
+        console.log(`  Subdivided (too large): ${chunkingStats.subdivided || 0}`);
+        console.log(`  Merged small chunks: ${chunkingStats.mergedSmall || 0}`);
+        console.log(`  Statement-level fallback: ${chunkingStats.statementFallback || 0}`);
+        console.log(`  Skipped (too small): ${chunkingStats.skippedSmall || 0}`);
         console.log(`  Final chunk count: ${processedChunks}`);
         
         const reductionRatio = chunkingStats.totalNodes > 0 
