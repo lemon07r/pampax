@@ -133,13 +133,13 @@ export const MODEL_PROFILES = {
     // Transformers.js models (local)
     'Xenova/all-MiniLM-L6-v2': {
         maxTokens: 256,
-        optimalTokens: 220,
-        minChunkTokens: 50,
-        maxChunkTokens: 240,
+        optimalTokens: 200,        // Target chunk size for embeddings
+        minChunkTokens: 50,        // Skip very small chunks
+        maxChunkTokens: 512,       // Only subdivide truly large functions (2x max tokens)
         overlapTokens: 20,
-        optimalChars: 880,
+        optimalChars: 800,
         minChunkChars: 200,
-        maxChunkChars: 960,
+        maxChunkChars: 2048,       // 2x character limit for subdivision
         overlapChars: 80,
         dimensions: 384,
         useTokens: true,
@@ -148,13 +148,13 @@ export const MODEL_PROFILES = {
     },
     'Xenova/all-mpnet-base-v2': {
         maxTokens: 384,
-        optimalTokens: 340,
+        optimalTokens: 300,        // Target chunk size
         minChunkTokens: 75,
-        maxChunkTokens: 360,
+        maxChunkTokens: 768,       // 2x max tokens - only subdivide huge functions
         overlapTokens: 30,
-        optimalChars: 1360,
+        optimalChars: 1200,
         minChunkChars: 300,
-        maxChunkChars: 1440,
+        maxChunkChars: 3072,       // 2x character limit
         overlapChars: 120,
         dimensions: 768,
         useTokens: true,

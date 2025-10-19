@@ -105,9 +105,14 @@ export async function analyzeNodeForChunking(node, source, rule, profile) {
         method = 'chars';
     }
     
+    // CRITICAL FIX: Only subdivide when exceeding MAX, not OPTIMAL
+    // Keeps semantic units (functions/methods) whole for better context
+    // Only split truly large functions that won't fit in the model
+    const subdivisionThreshold = limits.max;
+    
     return {
-        isSingleChunk: actualSize <= limits.optimal,
-        needsSubdivision: actualSize > limits.optimal,
+        isSingleChunk: actualSize <= subdivisionThreshold,
+        needsSubdivision: actualSize > subdivisionThreshold,
         subdivisionCandidates: findSemanticSubdivisions(node, rule),
         size: actualSize,
         unit: limits.unit,
@@ -145,10 +150,11 @@ export async function batchAnalyzeNodes(nodes, source, rule, profile, isSubdivis
     
     return nodes.map((node, i) => {
         const analysis = analyses[i];
+        const subdivisionThreshold = limits.max;
         return {
             node,
-            isSingleChunk: analysis.size <= limits.optimal,
-            needsSubdivision: analysis.size > limits.optimal,
+            isSingleChunk: analysis.size <= subdivisionThreshold,
+            needsSubdivision: analysis.size > subdivisionThreshold,
             subdivisionCandidates: findSemanticSubdivisions(node, rule),
             size: analysis.size,
             unit: limits.unit,

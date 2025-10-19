@@ -1036,6 +1036,8 @@ export async function indexProject({
                 '**/package-lock.json',
                 '**/yarn.lock',
                 '**/pnpm-lock.yaml',
+                '**/*.json',              // Exclude JSON config files (excessive granularity)
+                '**/*.sh',                // Exclude shell scripts (command-level chunking too granular)
                 '**/examples/**',
                 '**/assets/**'
             ],
