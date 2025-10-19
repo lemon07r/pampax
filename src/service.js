@@ -1035,7 +1035,9 @@ export async function indexProject({
                 '**/pampa.codemap.json.backup-*',
                 '**/package-lock.json',
                 '**/yarn.lock',
-                '**/pnpm-lock.yaml'
+                '**/pnpm-lock.yaml',
+                '**/examples/**',
+                '**/assets/**'
             ],
             onlyFiles: true,
             dot: false
