@@ -155,8 +155,6 @@ PAMPAX can index and search code in several languages out of the box:
 -   Go (`.go`)
 -   Java (`.java`)
 
-## 🚀 MCP Installation (Recommended)
-
 ## 🆕 What's New in v1.14 - Token-Based Chunking
 
 PAMPAX v1.14.0 introduces intelligent token-based chunking that automatically optimizes chunk sizes for your embedding model:
@@ -184,6 +182,8 @@ pampax index --provider openai
 ```
 
 See [TOKEN_CHUNKING_v1.14.md](TOKEN_CHUNKING_v1.14.md) for full documentation and [MIGRATION_GUIDE_v1.14.md](MIGRATION_GUIDE_v1.14.md) for upgrade instructions.
+
+## 🚀 MCP Installation (Recommended)
 
 ### 1. Configure your MCP client
 
