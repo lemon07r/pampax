@@ -1029,7 +1029,13 @@ export async function indexProject({
                 '**/.yarn/**',
                 '**/Library/**',
                 '**/System/**',
-                '**/.Trash/**'
+                '**/.Trash/**',
+                '**/.pampa/**',
+                '**/pampa.codemap.json',
+                '**/pampa.codemap.json.backup-*',
+                '**/package-lock.json',
+                '**/yarn.lock',
+                '**/pnpm-lock.yaml'
             ],
             onlyFiles: true,
             dot: false
