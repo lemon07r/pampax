@@ -12,11 +12,19 @@ import fs from 'fs';
 import path from 'path';
 import sqlite3 from 'sqlite3';
 import Parser from 'tree-sitter';
+import LangBash from 'tree-sitter-bash';
+import LangC from 'tree-sitter-c';
+import LangCSharp from 'tree-sitter-c-sharp';
+import LangCpp from 'tree-sitter-cpp';
 import LangGo from 'tree-sitter-go';
 import LangJava from 'tree-sitter-java';
 import LangJS from 'tree-sitter-javascript';
 import LangPHP from 'tree-sitter-php';
 import LangPython from 'tree-sitter-python';
+import LangRuby from 'tree-sitter-ruby';
+import LangRust from 'tree-sitter-rust';
+import LangScala from 'tree-sitter-scala';
+import LangSwift from 'tree-sitter-swift';
 import LangTSX from 'tree-sitter-typescript/bindings/node/tsx.js';
 import LangTS from 'tree-sitter-typescript/bindings/node/typescript.js';
 import { promisify } from 'util';
@@ -78,13 +86,21 @@ function resolveTreeSitterLanguage(module, preferredKey = null) {
 }
 
 const RESOLVED_LANGUAGES = {
+    bash: resolveTreeSitterLanguage(LangBash),
+    c: resolveTreeSitterLanguage(LangC),
+    csharp: resolveTreeSitterLanguage(LangCSharp),
+    cpp: resolveTreeSitterLanguage(LangCpp),
+    go: resolveTreeSitterLanguage(LangGo),
+    java: resolveTreeSitterLanguage(LangJava),
+    javascript: resolveTreeSitterLanguage(LangJS, 'javascript'),
     php: resolveTreeSitterLanguage(LangPHP, 'php'),
     python: resolveTreeSitterLanguage(LangPython),
-    javascript: resolveTreeSitterLanguage(LangJS, 'javascript'),
-    typescript: resolveTreeSitterLanguage(LangTS),
+    ruby: resolveTreeSitterLanguage(LangRuby),
+    rust: resolveTreeSitterLanguage(LangRust),
+    scala: resolveTreeSitterLanguage(LangScala),
+    swift: resolveTreeSitterLanguage(LangSwift),
     tsx: resolveTreeSitterLanguage(LangTSX),
-    go: resolveTreeSitterLanguage(LangGo),
-    java: resolveTreeSitterLanguage(LangJava)
+    typescript: resolveTreeSitterLanguage(LangTS)
 };
 
 const LANG_RULES = {
@@ -162,6 +178,142 @@ const LANG_RULES = {
         nodeTypes: ['method_declaration', 'class_declaration'],
         variableTypes: ['variable_declaration', 'field_declaration'],
         commentPattern: /\/\*\*[\s\S]*?\*\//g
+    },
+    '.cs': {
+        lang: 'csharp',
+        ts: RESOLVED_LANGUAGES.csharp,
+        nodeTypes: ['method_declaration', 'class_declaration', 'struct_declaration', 'interface_declaration'],
+        subdivisionTypes: {
+            'class_declaration': ['method_declaration', 'property_declaration', 'field_declaration'],
+            'struct_declaration': ['method_declaration', 'property_declaration', 'field_declaration'],
+            'interface_declaration': ['method_declaration', 'property_declaration'],
+            'method_declaration': ['if_statement', 'try_statement', 'foreach_statement']
+        },
+        variableTypes: ['variable_declaration', 'field_declaration', 'property_declaration'],
+        commentPattern: /\/\*\*[\s\S]*?\*\//g
+    },
+    '.rs': {
+        lang: 'rust',
+        ts: RESOLVED_LANGUAGES.rust,
+        nodeTypes: ['function_item', 'impl_item', 'struct_item', 'enum_item', 'trait_item', 'mod_item'],
+        subdivisionTypes: {
+            'impl_item': ['function_item'],
+            'mod_item': ['function_item', 'struct_item', 'enum_item', 'trait_item'],
+            'trait_item': ['function_signature']
+        },
+        variableTypes: ['let_declaration', 'const_item', 'static_item'],
+        commentPattern: /\/\/\/.*|\/\*\*[\s\S]*?\*\//g
+    },
+    '.rb': {
+        lang: 'ruby',
+        ts: RESOLVED_LANGUAGES.ruby,
+        nodeTypes: ['method', 'class', 'module', 'singleton_method'],
+        subdivisionTypes: {
+            'class': ['method', 'singleton_method'],
+            'module': ['method', 'singleton_method']
+        },
+        variableTypes: ['assignment', 'instance_variable', 'class_variable'],
+        commentPattern: /#.*$/gm
+    },
+    '.cpp': {
+        lang: 'cpp',
+        ts: RESOLVED_LANGUAGES.cpp,
+        nodeTypes: ['function_definition', 'class_specifier', 'struct_specifier', 'namespace_definition'],
+        subdivisionTypes: {
+            'class_specifier': ['function_definition', 'field_declaration'],
+            'struct_specifier': ['function_definition', 'field_declaration'],
+            'namespace_definition': ['function_definition', 'class_specifier', 'struct_specifier']
+        },
+        variableTypes: ['declaration', 'field_declaration'],
+        commentPattern: /\/\*[\s\S]*?\*\//g
+    },
+    '.hpp': {
+        lang: 'cpp',
+        ts: RESOLVED_LANGUAGES.cpp,
+        nodeTypes: ['function_definition', 'class_specifier', 'struct_specifier', 'namespace_definition'],
+        subdivisionTypes: {
+            'class_specifier': ['function_definition', 'field_declaration'],
+            'struct_specifier': ['function_definition', 'field_declaration'],
+            'namespace_definition': ['function_definition', 'class_specifier', 'struct_specifier']
+        },
+        variableTypes: ['declaration', 'field_declaration'],
+        commentPattern: /\/\*[\s\S]*?\*\//g
+    },
+    '.cc': {
+        lang: 'cpp',
+        ts: RESOLVED_LANGUAGES.cpp,
+        nodeTypes: ['function_definition', 'class_specifier', 'struct_specifier', 'namespace_definition'],
+        subdivisionTypes: {
+            'class_specifier': ['function_definition', 'field_declaration'],
+            'struct_specifier': ['function_definition', 'field_declaration'],
+            'namespace_definition': ['function_definition', 'class_specifier', 'struct_specifier']
+        },
+        variableTypes: ['declaration', 'field_declaration'],
+        commentPattern: /\/\*[\s\S]*?\*\//g
+    },
+    '.c': {
+        lang: 'c',
+        ts: RESOLVED_LANGUAGES.c,
+        nodeTypes: ['function_definition', 'struct_specifier', 'declaration'],
+        subdivisionTypes: {
+            'struct_specifier': ['field_declaration']
+        },
+        variableTypes: ['declaration'],
+        commentPattern: /\/\*[\s\S]*?\*\//g
+    },
+    '.h': {
+        lang: 'c',
+        ts: RESOLVED_LANGUAGES.c,
+        nodeTypes: ['function_definition', 'struct_specifier', 'declaration'],
+        subdivisionTypes: {
+            'struct_specifier': ['field_declaration']
+        },
+        variableTypes: ['declaration'],
+        commentPattern: /\/\*[\s\S]*?\*\//g
+    },
+    '.scala': {
+        lang: 'scala',
+        ts: RESOLVED_LANGUAGES.scala,
+        nodeTypes: ['function_definition', 'class_definition', 'object_definition', 'trait_definition'],
+        subdivisionTypes: {
+            'class_definition': ['function_definition', 'val_definition', 'var_declaration'],
+            'object_definition': ['function_definition', 'val_definition'],
+            'trait_definition': ['function_definition', 'function_declaration']
+        },
+        variableTypes: ['val_definition', 'var_declaration'],
+        commentPattern: /\/\*\*[\s\S]*?\*\//g
+    },
+    '.swift': {
+        lang: 'swift',
+        ts: RESOLVED_LANGUAGES.swift,
+        nodeTypes: ['function_declaration', 'class_declaration', 'struct_declaration', 'protocol_declaration'],
+        subdivisionTypes: {
+            'class_declaration': ['function_declaration', 'property_declaration'],
+            'struct_declaration': ['function_declaration', 'property_declaration'],
+            'protocol_declaration': ['function_declaration']
+        },
+        variableTypes: ['property_declaration', 'variable_declaration'],
+        commentPattern: /\/\*\*[\s\S]*?\*\//g
+    },
+    '.sh': {
+        lang: 'bash',
+        ts: RESOLVED_LANGUAGES.bash,
+        nodeTypes: ['function_definition', 'command'],
+        subdivisionTypes: {
+            'function_definition': ['command', 'if_statement', 'for_statement', 'while_statement']
+        },
+        variableTypes: ['variable_assignment'],
+        commentPattern: /#.*$/gm
+    },
+    '.bash': {
+        lang: 'bash',
+        ts: RESOLVED_LANGUAGES.bash,
+        nodeTypes: ['function_definition', 'command'],
+        subdivisionTypes: {
+            'function_definition': ['command', 'if_statement', 'for_statement', 'while_statement']
+        },
+        variableTypes: ['variable_assignment'],
+        commentPattern: /#.*$/gm
     }
 };
 
