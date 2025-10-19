@@ -5,6 +5,8 @@
  * for generating vector embeddings from code chunks.
  */
 
+import { createRateLimiter } from './utils/rate-limiter.js';
+
 // ============================================================================
 // BASE PROVIDER CLASS
 // ============================================================================
@@ -84,16 +86,19 @@ async function getTokenCounter(modelName) {
 
 export const MODEL_PROFILES = {
     // OpenAI models
+    // LESS AGGRESSIVE CHUNKING: Preserve more context by allowing larger chunks
+    // - Increased minChunkTokens to merge more small functions
+    // - Increased maxChunkTokens to keep whole functions/classes together
     'text-embedding-3-large': {
         maxTokens: 8191,
-        optimalTokens: 1800,
-        minChunkTokens: 100,
-        maxChunkTokens: 2000,
-        overlapTokens: 50,
-        optimalChars: 7000,
-        minChunkChars: 400,
-        maxChunkChars: 8000,
-        overlapChars: 200,
+        optimalTokens: 4000,          // Target larger chunks for better context
+        minChunkTokens: 400,          // Merge small functions (up from 100)
+        maxChunkTokens: 6000,         // Only subdivide huge code (up from 2000)
+        overlapTokens: 100,
+        optimalChars: 16000,
+        minChunkChars: 1600,
+        maxChunkChars: 24000,
+        overlapChars: 400,
         dimensions: 3072,
         useTokens: true,
         tokenizerType: 'tiktoken',
@@ -101,14 +106,14 @@ export const MODEL_PROFILES = {
     },
     'text-embedding-3-small': {
         maxTokens: 8191,
-        optimalTokens: 1800,
-        minChunkTokens: 100,
-        maxChunkTokens: 2000,
-        overlapTokens: 50,
-        optimalChars: 7000,
-        minChunkChars: 400,
-        maxChunkChars: 8000,
-        overlapChars: 200,
+        optimalTokens: 4000,
+        minChunkTokens: 400,
+        maxChunkTokens: 6000,
+        overlapTokens: 100,
+        optimalChars: 16000,
+        minChunkChars: 1600,
+        maxChunkChars: 24000,
+        overlapChars: 400,
         dimensions: 1536,
         useTokens: true,
         tokenizerType: 'tiktoken',
@@ -116,14 +121,14 @@ export const MODEL_PROFILES = {
     },
     'text-embedding-ada-002': {
         maxTokens: 8191,
-        optimalTokens: 1800,
-        minChunkTokens: 100,
-        maxChunkTokens: 2000,
-        overlapTokens: 50,
-        optimalChars: 7000,
-        minChunkChars: 400,
-        maxChunkChars: 8000,
-        overlapChars: 200,
+        optimalTokens: 4000,
+        minChunkTokens: 400,
+        maxChunkTokens: 6000,
+        overlapTokens: 100,
+        optimalChars: 16000,
+        minChunkChars: 1600,
+        maxChunkChars: 24000,
+        overlapChars: 400,
         dimensions: 1536,
         useTokens: true,
         tokenizerType: 'tiktoken',
@@ -165,14 +170,14 @@ export const MODEL_PROFILES = {
     // Ollama models (use tiktoken for compatibility)
     'nomic-embed-text': {
         maxTokens: 8192,
-        optimalTokens: 1800,
-        minChunkTokens: 100,
-        maxChunkTokens: 2000,
-        overlapTokens: 50,
-        optimalChars: 7000,
-        minChunkChars: 400,
-        maxChunkChars: 8000,
-        overlapChars: 200,
+        optimalTokens: 4000,
+        minChunkTokens: 400,
+        maxChunkTokens: 6000,
+        overlapTokens: 100,
+        optimalChars: 16000,
+        minChunkChars: 1600,
+        maxChunkChars: 24000,
+        overlapChars: 400,
         dimensions: 768,
         useTokens: true,
         tokenizerType: 'tiktoken',
@@ -308,6 +313,8 @@ export class OpenAIProvider extends EmbeddingProvider {
         this.model = process.env.PAMPAX_OPENAI_EMBEDDING_MODEL 
                      || process.env.OPENAI_MODEL 
                      || 'text-embedding-3-large';
+        // Initialize rate limiter for API throttling
+        this.rateLimiter = createRateLimiter('OpenAI');
     }
 
     async init() {
@@ -339,11 +346,14 @@ export class OpenAIProvider extends EmbeddingProvider {
         const limits = getSizeLimits(profile);
         const maxChars = profile.maxChunkChars || 8000;
         
-        const { data } = await this.openai.embeddings.create({
-            model: this.model,
-            input: text.slice(0, maxChars)
+        // Use rate limiter to prevent 429 errors
+        return await this.rateLimiter.execute(async () => {
+            const { data } = await this.openai.embeddings.create({
+                model: this.model,
+                input: text.slice(0, maxChars)
+            });
+            return data[0].embedding;
         });
-        return data[0].embedding;
     }
 
     getDimensions() {
@@ -380,6 +390,8 @@ export class TransformersProvider extends EmbeddingProvider {
         this.model = process.env.PAMPAX_TRANSFORMERS_MODEL 
                      || 'Xenova/all-MiniLM-L6-v2';
         this.initialized = false;
+        // No rate limiting for local models
+        this.rateLimiter = createRateLimiter('Transformers.js (Local)');
     }
 
     async init() {
@@ -441,6 +453,8 @@ export class OllamaProvider extends EmbeddingProvider {
         super();
         this.model = model;
         this.ollama = null;
+        // No rate limiting for local models
+        this.rateLimiter = createRateLimiter('Ollama');
     }
 
     async init() {
@@ -461,11 +475,14 @@ export class OllamaProvider extends EmbeddingProvider {
         const profile = await getModelProfile('Ollama', this.model);
         const maxChars = profile.maxChunkChars || 8000;
         
-        const response = await this.ollama.embeddings({
-            model: this.model,
-            prompt: text.slice(0, maxChars)
+        // Use rate limiter (though typically unlimited for local models)
+        return await this.rateLimiter.execute(async () => {
+            const response = await this.ollama.embeddings({
+                model: this.model,
+                prompt: text.slice(0, maxChars)
+            });
+            return response.embedding;
         });
-        return response.embedding;
     }
 
     getDimensions() {
@@ -498,6 +515,8 @@ export class CohereProvider extends EmbeddingProvider {
         // Support model selection via environment variable
         this.model = process.env.PAMPAX_COHERE_MODEL 
                      || 'embed-english-v3.0';
+        // Initialize rate limiter for API throttling
+        this.rateLimiter = createRateLimiter('Cohere');
     }
 
     async init() {
@@ -520,12 +539,15 @@ export class CohereProvider extends EmbeddingProvider {
         const profile = await getModelProfile(this.getName(), this.model);
         const maxChars = profile.maxChunkChars || 1920;
         
-        const response = await this.cohere.embed({
-            texts: [text.slice(0, maxChars)],
-            model: this.model,
-            inputType: 'search_document'
+        // Use rate limiter to prevent hitting Cohere limits
+        return await this.rateLimiter.execute(async () => {
+            const response = await this.cohere.embed({
+                texts: [text.slice(0, maxChars)],
+                model: this.model,
+                inputType: 'search_document'
+            });
+            return response.embeddings[0];
         });
-        return response.embeddings[0];
     }
 
     getDimensions() {

@@ -1100,6 +1100,16 @@ export async function indexProject({
     } else {
         console.log(`  ℹ Using character estimation (token counting unavailable)`);
     }
+    
+    // Display rate limiting info
+    if (embeddingProvider.rateLimiter) {
+        const rateLimiterStats = embeddingProvider.rateLimiter.getStats();
+        if (rateLimiterStats.isLimited) {
+            console.log(`  🔒 Rate limiting: ${rateLimiterStats.rpm} requests/minute`);
+        } else {
+            console.log(`  ⚡ Rate limiting: disabled (local model)`);
+        }
+    }
     console.log('');
 
     // Initialize database with the correct base path
