@@ -63,6 +63,10 @@ go.sum
 .pampa/
 pampa.codemap.json
 
+# Backups de la base de datos (creados durante testing)
+.pampa.backup-*/
+pampa.codemap.json.backup-*
+
 # Variables de entorno
 .env
 .env.local
@@ -95,6 +99,7 @@ build/
 
 # Archivos de test
 coverage/
+test-*.js
 
 # Test implementations (contenido privado, NO commitear)
 test/test-implementations/*
