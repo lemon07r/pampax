@@ -155,14 +155,14 @@ PAMPAX can index and search code in 21 languages out of the box:
 -   **Java** (`.java`)
 -   **Kotlin** (`.kt`) ⭐ _NEW_
 -   **Go** (`.go`)
--   **Rust** (`.rs`)
--   **C++** (`.cpp`, `.hpp`, `.cc`)
--   **C** (`.c`, `.h`)
--   **C#** (`.cs`)
+-   **Rust** (`.rs`) ⭐ _NEW_
+-   **C++** (`.cpp`, `.hpp`, `.cc`) ⭐ _NEW_
+-   **C** (`.c`, `.h`) ⭐ _NEW_
+-   **C#** (`.cs`) ⭐ _NEW_
 -   **PHP** (`.php`)
--   **Ruby** (`.rb`)
--   **Scala** (`.scala`)
--   **Swift** (`.swift`)
+-   **Ruby** (`.rb`) ⭐ _NEW_
+-   **Scala** (`.scala`) ⭐ _NEW_
+-   **Swift** (`.swift`) ⭐ _NEW_
 -   **Lua** (`.lua`) ⭐ _NEW_
 -   **OCaml** (`.ml`, `.mli`) ⭐ _NEW_
 -   **Haskell** (`.hs`) ⭐ _NEW_
