@@ -16,9 +16,17 @@ import LangBash from 'tree-sitter-bash';
 import LangC from 'tree-sitter-c';
 import LangCSharp from 'tree-sitter-c-sharp';
 import LangCpp from 'tree-sitter-cpp';
+import LangCSS from 'tree-sitter-css';
+import LangElixir from 'tree-sitter-elixir';
 import LangGo from 'tree-sitter-go';
+import LangHaskell from 'tree-sitter-haskell';
+import LangHTML from 'tree-sitter-html';
 import LangJava from 'tree-sitter-java';
 import LangJS from 'tree-sitter-javascript';
+import LangJSON from 'tree-sitter-json';
+import LangKotlin from '@tree-sitter-grammars/tree-sitter-kotlin';
+import LangLua from 'tree-sitter-lua';
+import LangOCaml from 'tree-sitter-ocaml';
 import LangPHP from 'tree-sitter-php';
 import LangPython from 'tree-sitter-python';
 import LangRuby from 'tree-sitter-ruby';
@@ -90,9 +98,17 @@ const RESOLVED_LANGUAGES = {
     c: resolveTreeSitterLanguage(LangC),
     csharp: resolveTreeSitterLanguage(LangCSharp),
     cpp: resolveTreeSitterLanguage(LangCpp),
+    css: resolveTreeSitterLanguage(LangCSS),
+    elixir: resolveTreeSitterLanguage(LangElixir),
     go: resolveTreeSitterLanguage(LangGo),
+    haskell: resolveTreeSitterLanguage(LangHaskell),
+    html: resolveTreeSitterLanguage(LangHTML),
     java: resolveTreeSitterLanguage(LangJava),
     javascript: resolveTreeSitterLanguage(LangJS, 'javascript'),
+    json: resolveTreeSitterLanguage(LangJSON),
+    kotlin: resolveTreeSitterLanguage(LangKotlin),
+    lua: resolveTreeSitterLanguage(LangLua),
+    ocaml: resolveTreeSitterLanguage(LangOCaml, 'ocaml'),
     php: resolveTreeSitterLanguage(LangPHP, 'php'),
     python: resolveTreeSitterLanguage(LangPython),
     ruby: resolveTreeSitterLanguage(LangRuby),
@@ -313,6 +329,121 @@ const LANG_RULES = {
             'function_definition': ['command', 'if_statement', 'for_statement', 'while_statement']
         },
         variableTypes: ['variable_assignment'],
+        commentPattern: /#.*$/gm
+    },
+    '.kt': {
+        lang: 'kotlin',
+        ts: RESOLVED_LANGUAGES.kotlin,
+        nodeTypes: ['function_declaration', 'property_declaration', 'class_declaration', 'object_declaration'],
+        subdivisionTypes: {
+            'class_declaration': ['function_declaration', 'property_declaration'],
+            'object_declaration': ['function_declaration', 'property_declaration'],
+            'function_declaration': ['if_expression', 'when_expression', 'try_expression']
+        },
+        variableTypes: ['property_declaration', 'variable_declaration'],
+        commentPattern: /\/\*\*[\s\S]*?\*\//g
+    },
+    '.lua': {
+        lang: 'lua',
+        ts: RESOLVED_LANGUAGES.lua,
+        nodeTypes: ['function_declaration', 'function_definition', 'function_call', 'table_constructor'],
+        subdivisionTypes: {
+            'function_definition': ['function_definition', 'if_statement', 'for_statement']
+        },
+        variableTypes: ['variable_declaration', 'assignment_statement'],
+        commentPattern: /--.*$/gm
+    },
+    '.html': {
+        lang: 'html',
+        ts: RESOLVED_LANGUAGES.html,
+        nodeTypes: ['element', 'start_tag', 'script_element', 'style_element'],
+        subdivisionTypes: {
+            'element': ['element']
+        },
+        variableTypes: [],
+        commentPattern: /<!--[\s\S]*?-->/g
+    },
+    '.htm': {
+        lang: 'html',
+        ts: RESOLVED_LANGUAGES.html,
+        nodeTypes: ['element', 'start_tag', 'script_element', 'style_element'],
+        subdivisionTypes: {
+            'element': ['element']
+        },
+        variableTypes: [],
+        commentPattern: /<!--[\s\S]*?-->/g
+    },
+    '.css': {
+        lang: 'css',
+        ts: RESOLVED_LANGUAGES.css,
+        nodeTypes: ['rule_set', 'declaration', 'selector'],
+        subdivisionTypes: {
+            'rule_set': ['declaration']
+        },
+        variableTypes: [],
+        commentPattern: /\/\*[\s\S]*?\*\//g
+    },
+    '.json': {
+        lang: 'json',
+        ts: RESOLVED_LANGUAGES.json,
+        nodeTypes: ['object', 'array', 'pair'],
+        subdivisionTypes: {
+            'object': ['pair'],
+            'array': ['object', 'array']
+        },
+        variableTypes: [],
+        commentPattern: null
+    },
+    '.ml': {
+        lang: 'ocaml',
+        ts: RESOLVED_LANGUAGES.ocaml,
+        nodeTypes: ['value_definition', 'type_definition', 'module_definition', 'let_binding'],
+        subdivisionTypes: {
+            'module_definition': ['value_definition', 'type_definition'],
+            'value_definition': ['let_binding']
+        },
+        variableTypes: ['let_binding', 'value_definition'],
+        commentPattern: /\(\*[\s\S]*?\*\)/g
+    },
+    '.mli': {
+        lang: 'ocaml',
+        ts: RESOLVED_LANGUAGES.ocaml,
+        nodeTypes: ['value_specification', 'type_definition', 'module_definition'],
+        subdivisionTypes: {
+            'module_definition': ['value_specification', 'type_definition']
+        },
+        variableTypes: ['value_specification'],
+        commentPattern: /\(\*[\s\S]*?\*\)/g
+    },
+    '.hs': {
+        lang: 'haskell',
+        ts: RESOLVED_LANGUAGES.haskell,
+        nodeTypes: ['function', 'type_signature', 'data_declaration', 'class_declaration'],
+        subdivisionTypes: {
+            'class_declaration': ['function', 'type_signature'],
+            'data_declaration': ['constructor']
+        },
+        variableTypes: ['signature', 'bind'],
+        commentPattern: /--.*$/gm
+    },
+    '.ex': {
+        lang: 'elixir',
+        ts: RESOLVED_LANGUAGES.elixir,
+        nodeTypes: ['call', 'anonymous_function'],
+        subdivisionTypes: {
+            'call': ['call', 'anonymous_function']
+        },
+        variableTypes: ['identifier'],
+        commentPattern: /#.*$/gm
+    },
+    '.exs': {
+        lang: 'elixir',
+        ts: RESOLVED_LANGUAGES.elixir,
+        nodeTypes: ['call', 'anonymous_function'],
+        subdivisionTypes: {
+            'call': ['call', 'anonymous_function']
+        },
+        variableTypes: ['identifier'],
         commentPattern: /#.*$/gm
     }
 };

@@ -147,20 +147,33 @@ async function createStripeCheckoutSession(sessionData) {
 
 ## 📝 Supported Languages
 
-PAMPAX can index and search code in multiple languages out of the box:
+PAMPAX can index and search code in 21 languages out of the box:
 
+### Programming Languages
 -   **JavaScript / TypeScript** (`.js`, `.ts`, `.tsx`, `.jsx`)
--   **PHP** (`.php`)
 -   **Python** (`.py`)
--   **Go** (`.go`)
 -   **Java** (`.java`)
--   **C#** (`.cs`)
+-   **Kotlin** (`.kt`) ⭐ _NEW_
+-   **Go** (`.go`)
 -   **Rust** (`.rs`)
--   **Ruby** (`.rb`)
 -   **C++** (`.cpp`, `.hpp`, `.cc`)
 -   **C** (`.c`, `.h`)
+-   **C#** (`.cs`)
+-   **PHP** (`.php`)
+-   **Ruby** (`.rb`)
 -   **Scala** (`.scala`)
 -   **Swift** (`.swift`)
+-   **Lua** (`.lua`) ⭐ _NEW_
+-   **OCaml** (`.ml`, `.mli`) ⭐ _NEW_
+-   **Haskell** (`.hs`) ⭐ _NEW_
+-   **Elixir** (`.ex`, `.exs`) ⭐ _NEW_
+
+### Web & Data Formats
+-   **HTML** (`.html`, `.htm`) ⭐ _NEW_
+-   **CSS** (`.css`) ⭐ _NEW_
+-   **JSON** (`.json`) ⭐ _NEW_
+
+### Shell
 -   **Bash** (`.sh`, `.bash`)
 
 ## 🆕 What's New in v1.14 - Token-Based Chunking
