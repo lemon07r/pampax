@@ -212,7 +212,7 @@ See [TOKEN_CHUNKING_v1.14.md](TOKEN_CHUNKING_v1.14.md) for full documentation an
 
 Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
-**Example with Novita.ai (Recommended - Absolute Maximum Quality):**
+**Example with Nebius (Recommended - High Quality and Very Cheap):**
 ```json
 {
 	"mcpServers": {
@@ -220,11 +220,12 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 			"command": "npx",
 			"args": ["-y", "pampax", "mcp"],
 			"env": {
-				"OPENAI_API_KEY": "your-novita-api-key",
-				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
-				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",
+				"OPENAI_API_KEY": "your-api-key",
+				"OPENAI_BASE_URL": "https://api.studio.nebius.com/v1/",
+				"PAMPAX_OPENAI_EMBEDDING_MODEL": "Qwen/Qwen3-Embedding-8B",
 				"PAMPAX_MAX_TOKENS": "8192",
-				"PAMPAX_DIMENSIONS": "4096"
+				"PAMPAX_DIMENSIONS": "4096",
+				"PAMPAX_RATE_LIMIT": "500"
 			}
 		}
 	}
@@ -253,6 +254,9 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 - `PAMPAX_DIMENSIONS` - Override embedding dimensions (default: model-specific)
 - `OPENAI_API_KEY` - Your OpenAI API key (if using OpenAI provider)
 - `PAMPAX_OPENAI_EMBEDDING_MODEL` - Model name (e.g., `text-embedding-3-small`)
+
+**Rate Limiting:**
+- `PAMPAX_RATE_LIMIT` - Maximum embedding API requests per minute (default: 50 for OpenAI, 100 for Cohere, unlimited for local models)
 
 **Reranker Configuration:**
 - `PAMPAX_RERANKER_MODEL` - Reranker model (default: `Xenova/ms-marco-MiniLM-L-6-v2`)
@@ -283,7 +287,8 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 				"PAMPAX_MAX_TOKENS": "8192",
 				"PAMPAX_DIMENSIONS": "4096",
 				"PAMPAX_RERANKER_MAX": "200",
-				"PAMPAX_RERANKER_MAX_TOKENS": "8192"
+				"PAMPAX_RERANKER_MAX_TOKENS": "8192",
+				"PAMPAX_RATE_LIMIT": "500"
 			}
 		}
 	}
@@ -308,7 +313,8 @@ Configure Cursor by creating or editing the `mcp.json` file in your configuratio
 				"PAMPAX_MAX_TOKENS": "8192",
 				"PAMPAX_DIMENSIONS": "4096",
 				"PAMPAX_RERANKER_MAX": "200",
-				"PAMPAX_RERANKER_MAX_TOKENS": "8192"
+				"PAMPAX_RERANKER_MAX_TOKENS": "8192",
+				"PAMPAX_RATE_LIMIT": "500"
 			}
 		}
 	}

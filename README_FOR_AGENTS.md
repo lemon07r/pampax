@@ -17,10 +17,11 @@
 			"args": ["-y", "pampax", "mcp"],
 			"env": {
 				"OPENAI_API_KEY": "your-api-key",
-				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
-				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",
+				"OPENAI_BASE_URL": "https://api.studio.nebius.com/v1/",
+				"PAMPAX_OPENAI_EMBEDDING_MODEL": "Qwen/Qwen3-Embedding-8B",
 				"PAMPAX_MAX_TOKENS": "8192",
-				"PAMPAX_DIMENSIONS": "4096"
+				"PAMPAX_DIMENSIONS": "4096",
+				"PAMPAX_RATE_LIMIT": "500"
 			}
 		}
 	}
@@ -95,11 +96,12 @@ You can configure which embedding model to use by adding environment variables t
 			"command": "npx",
 			"args": ["-y", "pampax", "mcp"],
 			"env": {
-				"OPENAI_API_KEY": "your-novita-api-key",
-				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
-				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",
+				"OPENAI_API_KEY": "your-api-key",
+				"OPENAI_BASE_URL": "https://api.studio.nebius.com/v1/",
+				"PAMPAX_OPENAI_EMBEDDING_MODEL": "Qwen/Qwen3-Embedding-8B",
 				"PAMPAX_MAX_TOKENS": "8192",
-				"PAMPAX_DIMENSIONS": "4096"
+				"PAMPAX_DIMENSIONS": "4096",
+				"PAMPAX_RATE_LIMIT": "500"
 			}
 		}
 	}
@@ -115,16 +117,17 @@ You can configure which embedding model to use by adding environment variables t
 			"command": "npx",
 			"args": ["-y", "pampax", "mcp"],
 			"env": {
-				"OPENAI_API_KEY": "your-novita-api-key",
-				"OPENAI_BASE_URL": "https://api.novita.ai/openai",
-				"PAMPAX_OPENAI_EMBEDDING_MODEL": "qwen/qwen3-embedding-8b",
+				"OPENAI_API_KEY": "your-api-key",
+				"OPENAI_BASE_URL": "https://api.studio.nebius.com/v1/",
+				"PAMPAX_OPENAI_EMBEDDING_MODEL": "Qwen/Qwen3-Embedding-8B",
 				"PAMPAX_RERANK_API_URL": "https://api.novita.ai/openai/v1/rerank",
 				"PAMPAX_RERANK_API_KEY": "your-novita-api-key",
 				"PAMPAX_RERANK_MODEL": "qwen/qwen3-reranker-8b",
 				"PAMPAX_MAX_TOKENS": "8192",
 				"PAMPAX_DIMENSIONS": "4096",
 				"PAMPAX_RERANKER_MAX": "200",
-				"PAMPAX_RERANKER_MAX_TOKENS": "8192"
+				"PAMPAX_RERANKER_MAX_TOKENS": "8192",
+				"PAMPAX_RATE_LIMIT": "500"
 			}
 		}
 	}
@@ -142,6 +145,9 @@ You can configure which embedding model to use by adding environment variables t
 *Chunking Configuration:*
 - `PAMPAX_MAX_TOKENS` - Maximum token limit for chunking (default: model-specific, usually 1800)
 - `PAMPAX_DIMENSIONS` - Embedding dimensions (default: model-specific)
+
+*Rate Limiting Configuration:*
+- `PAMPAX_RATE_LIMIT` - Maximum embedding API requests per minute (default: 50 for OpenAI, 100 for Cohere, unlimited for local models)
 
 *Reranking Configuration (Optional):*
 - `PAMPAX_RERANKER_MODEL` - Local reranker model (default: `Xenova/ms-marco-MiniLM-L-6-v2`)
