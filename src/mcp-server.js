@@ -80,7 +80,7 @@ class ErrorLogger {
 
         try {
             fs.appendFileSync(this.debugLogPath, logEntry);
-            console.log(`🐛 DEBUG [${timestamp}]: ${message}`);
+            console.error(`🐛 DEBUG [${timestamp}]: ${message}`);
         } catch (logError) {
             console.error('Failed to write to debug log:', logError.message);
         }

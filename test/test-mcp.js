@@ -9,7 +9,7 @@ import { spawn } from 'child_process';
 async function testMcpServer() {
     console.log('🔄 Starting MCP server test...\n');
 
-    const server = spawn('node', ['mcp-server.js'], {
+    const server = spawn('node', ['src/mcp-server.js'], {
         stdio: ['pipe', 'pipe', 'pipe']
     });
 
