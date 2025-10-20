@@ -25,6 +25,7 @@ import LangJava from 'tree-sitter-java';
 import LangJS from 'tree-sitter-javascript';
 import LangJSON from 'tree-sitter-json';
 import LangKotlin from '@tree-sitter-grammars/tree-sitter-kotlin';
+import LangMarkdown from '@tree-sitter-grammars/tree-sitter-markdown';
 import LangLua from 'tree-sitter-lua';
 import LangOCaml from 'tree-sitter-ocaml';
 import LangPHP from 'tree-sitter-php';
@@ -110,6 +111,7 @@ const RESOLVED_LANGUAGES = {
     json: resolveTreeSitterLanguage(LangJSON),
     kotlin: resolveTreeSitterLanguage(LangKotlin),
     lua: resolveTreeSitterLanguage(LangLua),
+    markdown: resolveTreeSitterLanguage(LangMarkdown),
     ocaml: resolveTreeSitterLanguage(LangOCaml, 'ocaml'),
     php: resolveTreeSitterLanguage(LangPHP, 'php'),
     python: resolveTreeSitterLanguage(LangPython),
@@ -461,6 +463,30 @@ const LANG_RULES = {
         },
         variableTypes: ['identifier'],
         commentPattern: /#.*$/gm
+    },
+    '.md': {
+        lang: 'markdown',
+        ts: RESOLVED_LANGUAGES.markdown,
+        nodeTypes: ['atx_heading', 'setext_heading', 'section', 'fenced_code_block', 'list_item'],
+        subdivisionTypes: {
+            'section': ['atx_heading', 'setext_heading', 'paragraph', 'fenced_code_block', 'list', 'block_quote'],
+            'list': ['list_item'],
+            'fenced_code_block': []
+        },
+        variableTypes: [],
+        commentPattern: /<!--[\s\S]*?-->/g
+    },
+    '.markdown': {
+        lang: 'markdown',
+        ts: RESOLVED_LANGUAGES.markdown,
+        nodeTypes: ['atx_heading', 'setext_heading', 'section', 'fenced_code_block', 'list_item'],
+        subdivisionTypes: {
+            'section': ['atx_heading', 'setext_heading', 'paragraph', 'fenced_code_block', 'list', 'block_quote'],
+            'list': ['list_item'],
+            'fenced_code_block': []
+        },
+        variableTypes: [],
+        commentPattern: /<!--[\s\S]*?-->/g
     }
 };
 
