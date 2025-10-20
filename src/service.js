@@ -148,11 +148,13 @@ const LANG_RULES = {
     '.js': {
         lang: 'javascript',
         ts: RESOLVED_LANGUAGES.javascript,
-        nodeTypes: ['function_declaration', 'method_definition', 'class_declaration'],
+        nodeTypes: ['function_declaration', 'method_definition', 'class_declaration', 'export_statement', 'lexical_declaration', 'expression_statement'],
         subdivisionTypes: {
             'class_declaration': ['method_definition', 'field_definition'],
             'function_declaration': ['function_declaration', 'if_statement', 'try_statement'],
-            'method_definition': ['function_declaration', 'if_statement', 'try_statement']
+            'method_definition': ['function_declaration', 'if_statement', 'try_statement'],
+            'export_statement': ['object', 'function_declaration'],
+            'expression_statement': ['call_expression', 'function']
         },
         variableTypes: ['const_declaration', 'let_declaration', 'variable_declaration'],
         commentPattern: /\/\*\*[\s\S]*?\*\//g
@@ -160,18 +162,25 @@ const LANG_RULES = {
     '.jsx': {
         lang: 'tsx',
         ts: RESOLVED_LANGUAGES.tsx,
-        nodeTypes: ['function_declaration', 'class_declaration'],
+        nodeTypes: ['function_declaration', 'class_declaration', 'export_statement', 'lexical_declaration', 'expression_statement'],
+        subdivisionTypes: {
+            'class_declaration': ['method_definition', 'field_definition'],
+            'export_statement': ['object', 'function_declaration'],
+            'expression_statement': ['call_expression', 'function']
+        },
         variableTypes: ['const_declaration', 'let_declaration', 'variable_declaration'],
         commentPattern: /\/\*\*[\s\S]*?\*\//g
     },
     '.ts': {
         lang: 'typescript',
         ts: RESOLVED_LANGUAGES.typescript,
-        nodeTypes: ['function_declaration', 'method_definition', 'class_declaration'],
+        nodeTypes: ['function_declaration', 'method_definition', 'class_declaration', 'export_statement', 'lexical_declaration', 'expression_statement'],
         subdivisionTypes: {
             'class_declaration': ['method_definition', 'field_definition'],
             'function_declaration': ['function_declaration', 'if_statement', 'try_statement'],
-            'method_definition': ['function_declaration', 'if_statement', 'try_statement']
+            'method_definition': ['function_declaration', 'if_statement', 'try_statement'],
+            'export_statement': ['object', 'function_declaration'],
+            'expression_statement': ['call_expression', 'function']
         },
         variableTypes: ['const_declaration', 'let_declaration', 'variable_declaration'],
         commentPattern: /\/\*\*[\s\S]*?\*\//g
@@ -179,7 +188,12 @@ const LANG_RULES = {
     '.tsx': {
         lang: 'tsx',
         ts: RESOLVED_LANGUAGES.tsx,
-        nodeTypes: ['function_declaration', 'class_declaration'],
+        nodeTypes: ['function_declaration', 'class_declaration', 'export_statement', 'lexical_declaration', 'expression_statement'],
+        subdivisionTypes: {
+            'class_declaration': ['method_definition', 'field_definition'],
+            'export_statement': ['object', 'function_declaration'],
+            'expression_statement': ['call_expression', 'function']
+        },
         variableTypes: ['const_declaration', 'let_declaration', 'variable_declaration'],
         commentPattern: /\/\*\*[\s\S]*?\*\//g
     },
@@ -1379,6 +1393,36 @@ export async function indexProject({
             
             // Collect all target nodes from the AST
             function collectNodes(node) {
+                // Special handling for export_statement to avoid duplicates
+                if (node.type === 'export_statement') {
+                    // Check if it exports a function/class declaration we'd collect anyway
+                    let hasDeclaration = false;
+                    for (let i = 0; i < node.childCount; i++) {
+                        const child = node.child(i);
+                        if (child && ['function_declaration', 'class_declaration', 'method_definition'].includes(child.type)) {
+                            hasDeclaration = true;
+                            break;
+                        }
+                    }
+                    
+                    // Only collect export_statement if it doesn't have a declaration we'd collect separately
+                    if (!hasDeclaration && rule.nodeTypes.includes(node.type)) {
+                        collectedNodes.push(node);
+                        return; // Don't recurse into children
+                    }
+                    
+                    // If it has a declaration, skip the export_statement itself and just recurse to find the declaration
+                    if (hasDeclaration) {
+                        for (let i = 0; i < node.childCount; i++) {
+                            const child = node.child(i);
+                            if (child) {
+                                collectNodes(child);
+                            }
+                        }
+                        return;
+                    }
+                }
+                
                 if (rule.nodeTypes.includes(node.type)) {
                     collectedNodes.push(node);
                 }
