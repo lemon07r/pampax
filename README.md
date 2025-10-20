@@ -1,6 +1,6 @@
 # PAMPAX – Protocol for Augmented Memory of Project Artifacts Extended
 
-**Enhanced fork** with native support for OpenAI-compatible APIs (OpenAI, LM Studio, llama.cpp, Azure, Novita.ai, etc.) and flexible reranking models (local Transformers.js or remote APIs). Performance benchmarks show significant improvements with advanced reranking—perfect scores with Qwen3-Reranker-8B. This fork also includes several important bug fixes, better handling of large files, and immproved performance. For detailed changes, see [CHANGELOG.md](CHANGELOG.md) or [RELEASE_SUMMARY_v1.13.md](RELEASE_SUMMARY_v1.13.md).
+**Enhanced fork** with performance optimizations and expanded capabilities. **85% chunk reduction** through intelligent file-level semantic grouping preserves context while dramatically reducing API costs. Native support for **21 languages** (up from 6) including Kotlin, Rust, C++, and Ruby. **Token-based chunking** with automatic model-aware sizing and **hybrid optimization** (81% efficiency gain) ensures fast indexing without data loss. Intelligent **rate limiting** prevents API throttling. Advanced **reranking** options (local Transformers.js or remote APIs) achieve perfect scores with models like Qwen3-Reranker-8B. Full support for OpenAI-compatible APIs (OpenAI, Nebius, LM Studio, llama.cpp, Azure, etc.). Built on upgraded tree-sitter v0.25 core for better parsing stability. For detailed changes, see [CHANGELOG.md](CHANGELOG.md).
 
 **Version 1.14.0** · **Token-Based Chunking** · **Semantic Search** · **MCP Compatible** · **Node.js**
 
