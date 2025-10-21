@@ -2225,12 +2225,13 @@ export async function searchCode(query, limit = 10, provider = 'auto', workingPa
 
             vectorResults = vectorResults.slice(0, remainingSlots);
 
-            if (vectorResults.length > 1 && normalizedScope.reranker === 'transformers') {
+            if (vectorResults.length > 1 && (normalizedScope.reranker === 'transformers' || normalizedScope.reranker === 'api')) {
                 try {
                     const reranked = await rerankCrossEncoder(query, vectorResults, {
                         max: Math.min(RERANKER_MAX_CANDIDATES, vectorResults.length),
                         getText: candidate => buildRerankerDocument(candidate),
-                        getScoreHint: candidate => extractRerankerScoreHint(candidate)
+                        getScoreHint: candidate => extractRerankerScoreHint(candidate),
+                        mode: normalizedScope.reranker
                     });
 
                     if (Array.isArray(reranked) && reranked.length === vectorResults.length) {

@@ -1,4 +1,4 @@
-export const RERANKER_OPTIONS = ['off', 'transformers'];
+export const RERANKER_OPTIONS = ['off', 'transformers', 'api'];
 export const DEFAULT_RERANKER = 'off';
 
 export function hasScopeFilters(scope = {}) {
