@@ -4,7 +4,8 @@ const DEFAULT_MODEL_ID = process.env.PAMPAX_RERANKER_MODEL || 'Xenova/ms-marco-M
 const DEFAULT_MAX_CANDIDATES = Number.parseInt(process.env.PAMPAX_RERANKER_MAX || '50', 10);
 const DEFAULT_MAX_TOKENS = Number.parseInt(process.env.PAMPAX_RERANKER_MAX_TOKENS || '512', 10);
 
-let pipelineFactory = null;
+let transformersModule = null;
+let tokenizerPromise = null;
 let modelPromise = null;
 let loadFailed = false;
 let testRerankOverride = null;
@@ -100,43 +101,63 @@ function extractScoreFromOutput(output) {
     return 0;
 }
 
-async function loadPipelineFactory() {
-    if (pipelineFactory || shouldMock() || loadFailed || testForceLoadFailure) {
-        return pipelineFactory;
+async function loadTransformersModule() {
+    if (transformersModule || shouldMock() || loadFailed || testForceLoadFailure) {
+        return transformersModule;
     }
 
     try {
-        const module = await import('@xenova/transformers');
-        if (typeof module.pipeline === 'function') {
-            pipelineFactory = module.pipeline;
-        } else if (module.default && typeof module.default.pipeline === 'function') {
-            pipelineFactory = module.default.pipeline;
-        }
+        transformersModule = await import('@xenova/transformers');
     } catch (error) {
         loadFailed = true;
         return null;
     }
 
-    return pipelineFactory;
+    return transformersModule;
+}
+
+async function getTokenizer() {
+    if (shouldMock() || loadFailed || testForceLoadFailure) {
+        return null;
+    }
+
+    const module = await loadTransformersModule();
+    if (!module) {
+        loadFailed = true;
+        return null;
+    }
+
+    if (!tokenizerPromise) {
+        const { AutoTokenizer } = module;
+        tokenizerPromise = AutoTokenizer.from_pretrained(DEFAULT_MODEL_ID).catch(error => {
+            loadFailed = true;
+            tokenizerPromise = null;
+            throw error;
+        });
+    }
+
+    try {
+        return await tokenizerPromise;
+    } catch (error) {
+        loadFailed = true;
+        return null;
+    }
 }
 
 async function getModel() {
-    if (shouldMock()) {
+    if (shouldMock() || loadFailed || testForceLoadFailure) {
         return null;
     }
 
-    if (loadFailed || testForceLoadFailure) {
-        return null;
-    }
-
-    const pipeline = await loadPipelineFactory();
-    if (!pipeline) {
+    const module = await loadTransformersModule();
+    if (!module) {
         loadFailed = true;
         return null;
     }
 
     if (!modelPromise) {
-        modelPromise = pipeline('text-classification', DEFAULT_MODEL_ID, {
+        const { AutoModelForSequenceClassification } = module;
+        modelPromise = AutoModelForSequenceClassification.from_pretrained(DEFAULT_MODEL_ID, {
             quantized: true
         }).catch(error => {
             loadFailed = true;
@@ -263,8 +284,10 @@ async function rerankCrossEncoderLocal(query, candidates, options = {}) {
         return [...rerankedTop, ...remainder];
     }
 
+    const tokenizer = await getTokenizer();
     const model = await getModel();
-    if (!model) {
+    
+    if (!tokenizer || !model) {
         return candidates;
     }
 
@@ -286,13 +309,25 @@ async function rerankCrossEncoderLocal(query, candidates, options = {}) {
     }
 
     try {
-        const inputs = texts.map(text => ({ text: query, text_pair: text }));
-        const outputs = await model(inputs);
+        // Use tokenizer and model directly to get raw logits
+        // This gives us proper relevance scores for reranking
+        const outputs = await Promise.all(
+            texts.map(async text => {
+                const inputs = tokenizer(query, {
+                    text_pair: text,
+                    padding: true,
+                    truncation: true
+                });
+                const output = await model(inputs);
+                // Return the first logit value (relevance score)
+                return output.logits.data[0];
+            })
+        );
 
         const scored = topCandidates
             .map((candidate, index) => ({
                 candidate,
-                score: extractScoreFromOutput(outputs[index])
+                score: outputs[index]
             }))
             .sort((a, b) => b.score - a.score);
 
@@ -306,7 +341,8 @@ async function rerankCrossEncoderLocal(query, candidates, options = {}) {
 }
 
 export function __resetForTests() {
-    pipelineFactory = null;
+    transformersModule = null;
+    tokenizerPromise = null;
     modelPromise = null;
     loadFailed = false;
     testRerankOverride = null;
