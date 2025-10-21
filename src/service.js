@@ -2305,6 +2305,24 @@ export async function searchCode(query, limit = 10, provider = 'auto', workingPa
             })
         ];
 
+        // ===== PHASE 6.5: FINAL SORT =====
+        // Sort combinedResults by score to ensure proper ordering
+        // When reranker is active, sort by rerankerScore; otherwise by main score
+        combinedResults.sort((a, b) => {
+            // If both have rerankerScore, use that (reranker overrides base score)
+            const hasRerankerA = typeof a.meta?.rerankerScore === 'number';
+            const hasRerankerB = typeof b.meta?.rerankerScore === 'number';
+            
+            if (hasRerankerA && hasRerankerB) {
+                return b.meta.rerankerScore - a.meta.rerankerScore;
+            }
+            
+            // Otherwise use the base score
+            const scoreA = a.meta?.score ?? 0;
+            const scoreB = b.meta?.score ?? 0;
+            return scoreB - scoreA;
+        });
+
         // If we still don't have enough results, add a message about it
         if (combinedResults.length === 0) {
             return {
