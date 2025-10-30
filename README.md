@@ -147,7 +147,7 @@ async function createStripeCheckoutSession(sessionData) {
 
 ## 📝 Supported Languages
 
-PAMPAX can index and search code in 21 languages out of the box:
+PAMPAX can index and search code in 22 languages out of the box:
 
 ### Programming Languages
 -   **JavaScript / TypeScript** (`.js`, `.ts`, `.tsx`, `.jsx`)
@@ -172,6 +172,7 @@ PAMPAX can index and search code in 21 languages out of the box:
 -   **HTML** (`.html`, `.htm`) ⭐ _NEW_
 -   **CSS** (`.css`) ⭐ _NEW_
 -   **JSON** (`.json`) ⭐ _NEW_
+-   **Markdown** (`.md`) ⭐ _NEW_
 
 ### Shell
 -   **Bash** (`.sh`, `.bash`) ⭐ _NEW_
@@ -290,7 +291,8 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 				"PAMPAX_DIMENSIONS": "4096",
 				"PAMPAX_RERANKER_MAX": "200",
 				"PAMPAX_RERANKER_MAX_TOKENS": "8192",
-				"PAMPAX_RATE_LIMIT": "500"
+				"PAMPAX_RATE_LIMIT": "500",
+				"PAMPAX_RERANKER_DEFAULT": "api"
 			}
 		}
 	}
@@ -316,7 +318,8 @@ Configure Cursor by creating or editing the `mcp.json` file in your configuratio
 				"PAMPAX_DIMENSIONS": "4096",
 				"PAMPAX_RERANKER_MAX": "200",
 				"PAMPAX_RERANKER_MAX_TOKENS": "8192",
-				"PAMPAX_RATE_LIMIT": "500"
+				"PAMPAX_RATE_LIMIT": "500",
+				"PAMPAX_RERANKER_DEFAULT": "api"
 			}
 		}
 	}

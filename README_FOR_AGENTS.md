@@ -127,7 +127,8 @@ You can configure which embedding model to use by adding environment variables t
 				"PAMPAX_DIMENSIONS": "4096",
 				"PAMPAX_RERANKER_MAX": "200",
 				"PAMPAX_RERANKER_MAX_TOKENS": "8192",
-				"PAMPAX_RATE_LIMIT": "500"
+				"PAMPAX_RATE_LIMIT": "500",
+				"PAMPAX_RERANKER_DEFAULT": "api"
 			}
 		}
 	}
@@ -157,6 +158,7 @@ You can configure which embedding model to use by adding environment variables t
 - `PAMPAX_RERANK_API_URL` - API endpoint for remote reranking (e.g., Cohere, Jina AI, Novita.ai)
 - `PAMPAX_RERANK_API_KEY` - API key for reranking service
 - `PAMPAX_RERANK_MODEL` - Model name for API reranker (e.g., `qwen/qwen3-reranker-8b`)
+- `PAMPAX_RERANKER_DEFAULT` - Set the reranker default (e.g., `api`)
 
 ### Step 2: Auto-install this rule in your system
 
