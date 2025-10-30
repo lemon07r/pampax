@@ -150,6 +150,7 @@ You can configure which embedding model to use by adding environment variables t
 - `PAMPAX_RATE_LIMIT` - Maximum embedding API requests per minute (default: 50 for OpenAI, 100 for Cohere, unlimited for local models)
 
 *Reranking Configuration (Optional):*
+- `PAMPAX_RERANKER_DEFAULT` - Default reranker mode (default: `off`, options: `off|transformers|api`)
 - `PAMPAX_RERANKER_MODEL` - Local reranker model (default: `Xenova/ms-marco-MiniLM-L-6-v2`)
 - `PAMPAX_RERANKER_MAX` - Max candidates to rerank (default: 50)
 - `PAMPAX_RERANKER_MAX_TOKENS` - Max tokens per document for reranker (default: 512)

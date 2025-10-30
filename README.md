@@ -259,6 +259,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 - `PAMPAX_RATE_LIMIT` - Maximum embedding API requests per minute (default: 50 for OpenAI, 100 for Cohere, unlimited for local models)
 
 **Reranker Configuration:**
+- `PAMPAX_RERANKER_DEFAULT` - Default reranker mode (default: `off`, options: `off|transformers|api`)
 - `PAMPAX_RERANKER_MODEL` - Reranker model (default: `Xenova/ms-marco-MiniLM-L-6-v2`)
 - `PAMPAX_RERANKER_MAX` - Max candidates to rerank (default: 50)
 - `PAMPAX_RERANKER_MAX_TOKENS` - Max tokens per document for reranker (default: 512)
@@ -284,6 +285,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 				"PAMPAX_RERANK_API_URL": "https://api.novita.ai/openai/v1/rerank",
 				"PAMPAX_RERANK_API_KEY": "your-novita-api-key",
 				"PAMPAX_RERANK_MODEL": "qwen/qwen3-reranker-8b",
+				"PAMPAX_RERANKER_DEFAULT": "api",
 				"PAMPAX_MAX_TOKENS": "8192",
 				"PAMPAX_DIMENSIONS": "4096",
 				"PAMPAX_RERANKER_MAX": "200",

@@ -1,3 +1,20 @@
+# [Unreleased]
+
+## 🔧 Fixes
+
+### Add PAMPAX_RERANKER_DEFAULT environment variable
+- **New environment variable**: `PAMPAX_RERANKER_DEFAULT` to set default reranker mode
+- **Options**: `off` (default), `transformers`, or `api`
+- **Use case**: Automatically enable reranker without passing parameter in every search
+- **Example**: Set `PAMPAX_RERANKER_DEFAULT=api` to always use API reranking by default
+- **Benefits**: Users with configured reranker APIs no longer need to explicitly pass `reranker: 'api'` in searches
+
+### Modified Files
+- `src/types/search.js` - Added environment variable support for default reranker
+- `README.md` - Updated documentation with new environment variable
+- `README_FOR_AGENTS.md` - Updated documentation with new environment variable
+- `test/reranker-default.test.js` - Added comprehensive tests for the new feature
+
 # [1.16.0](https://github.com/lemon07r/pampax/releases/tag/v1.16.0) (2025-01-20)
 
 ## 🎯 File-Level Semantic Grouping: 85% Chunk Reduction with Maximum Context Preservation

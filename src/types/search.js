@@ -1,5 +1,15 @@
 export const RERANKER_OPTIONS = ['off', 'transformers', 'api'];
-export const DEFAULT_RERANKER = 'off';
+
+// Get default reranker from environment variable, fallback to 'off'
+function getDefaultReranker() {
+    const envValue = process.env.PAMPAX_RERANKER_DEFAULT;
+    if (envValue && RERANKER_OPTIONS.includes(envValue.toLowerCase())) {
+        return envValue.toLowerCase();
+    }
+    return 'off';
+}
+
+export const DEFAULT_RERANKER = getDefaultReranker();
 
 export function hasScopeFilters(scope = {}) {
     if (!scope) {
