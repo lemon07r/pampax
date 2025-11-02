@@ -2,6 +2,13 @@
 
 ## 🔧 Fixes
 
+### Fix MCP server not respecting PAMPAX_RERANKER_DEFAULT environment variable
+- **Issue**: MCP server tool had hardcoded `.default('off')` for reranker parameter
+- **Impact**: `PAMPAX_RERANKER_DEFAULT=api` was ignored by MCP server, only worked in CLI
+- **Fix**: Removed hardcoded default, now properly uses `DEFAULT_RERANKER` from environment
+- **Benefit**: Consistent reranker behavior across all interfaces (CLI, service, and MCP)
+- **Modified files**: `src/mcp-server.js` - Removed `.default('off')` from reranker schema
+
 ### Add PAMPAX_RERANKER_DEFAULT environment variable
 - **New environment variable**: `PAMPAX_RERANKER_DEFAULT` to set default reranker mode
 - **Options**: `off` (default), `transformers`, or `api`
