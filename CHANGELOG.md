@@ -1,26 +1,24 @@
 # [Unreleased]
 
-## 🔧 Fixes
+# [1.16.11](https://github.com/lemon07r/pampax/releases/tag/v1.16.11) (2025-01-04)
 
-### Fix MCP server not respecting PAMPAX_RERANKER_DEFAULT environment variable
-- **Issue**: MCP server tool had hardcoded `.default('off')` for reranker parameter
-- **Impact**: `PAMPAX_RERANKER_DEFAULT=api` was ignored by MCP server, only worked in CLI
-- **Fix**: Removed hardcoded default, now properly uses `DEFAULT_RERANKER` from environment
-- **Benefit**: Consistent reranker behavior across all interfaces (CLI, service, and MCP)
-- **Modified files**: `src/mcp-server.js` - Removed `.default('off')` from reranker schema
+## 🐛 Bug Fixes
 
-### Add PAMPAX_RERANKER_DEFAULT environment variable
-- **New environment variable**: `PAMPAX_RERANKER_DEFAULT` to set default reranker mode
-- **Options**: `off` (default), `transformers`, or `api`
-- **Use case**: Automatically enable reranker without passing parameter in every search
-- **Example**: Set `PAMPAX_RERANKER_DEFAULT=api` to always use API reranking by default
-- **Benefits**: Users with configured reranker APIs no longer need to explicitly pass `reranker: 'api'` in searches
+### Fix CLI not respecting PAMPAX_RERANKER_DEFAULT environment variable
+- **Issue**: CLI had hardcoded `"off"` default for `--reranker` option, overriding `PAMPAX_RERANKER_DEFAULT`
+- **Impact**: Even with `PAMPAX_RERANKER_DEFAULT=api` set, API reranker was never called unless explicitly passing `--reranker api`
+- **Root cause**: Commander.js option default in `src/cli.js` line 223 was hardcoded to `"off"`
+- **Fix**: Changed CLI default from `"off"` to `DEFAULT_RERANKER` which reads from environment variable
+- **Result**: API reranker now works automatically when `PAMPAX_RERANKER_DEFAULT=api` is configured
 
 ### Modified Files
-- `src/types/search.js` - Added environment variable support for default reranker
-- `README.md` - Updated documentation with new environment variable
-- `README_FOR_AGENTS.md` - Updated documentation with new environment variable
-- `test/reranker-default.test.js` - Added comprehensive tests for the new feature
+- `src/cli.js` - Import `DEFAULT_RERANKER` and use it as default for `--reranker` option
+
+## 🎯 Impact
+Users with Novita, Cohere, or other API rerankers configured via `PAMPAX_RERANKER_DEFAULT=api` will now see:
+- ✅ Automatic API reranker usage without manual `--reranker api` flag
+- ✅ API usage visible in provider dashboards (Novita, Cohere, etc.)
+- ✅ Consistent reranker behavior across CLI, MCP server, and direct API usage
 
 # [1.16.0](https://github.com/lemon07r/pampax/releases/tag/v1.16.0) (2025-01-20)
 

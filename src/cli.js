@@ -10,6 +10,7 @@ import { readCodemap } from "./codemap/io.js";
 import { indexProject } from "./indexer.js";
 import { startWatch } from "./indexer/watch.js";
 import { searchCode } from "./service.js";
+import { DEFAULT_RERANKER } from "./types/search.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -219,7 +220,7 @@ program
   .option(
     "--reranker <mode>",
     "reranker strategy (off|transformers|api)",
-    "off",
+    DEFAULT_RERANKER,
   )
   .option(
     "--hybrid <mode>",

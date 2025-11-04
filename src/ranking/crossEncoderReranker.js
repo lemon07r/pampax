@@ -237,14 +237,14 @@ export async function rerankCrossEncoder(query, candidates, options = {}) {
 
     // Determine which reranker to use based on mode parameter or test override
     const requestedMode = options.mode || forceRerankMode;
-    
+
     // Route to API reranker if:
     // 1. Explicitly requested via mode='api'
     // 2. Not forced to local AND API is configured (auto-detect)
-    const useAPI = requestedMode === 'api' || 
-                   (requestedMode !== 'local' && requestedMode !== 'transformers' && 
+    const useAPI = requestedMode === 'api' ||
+                   (requestedMode !== 'local' && requestedMode !== 'transformers' &&
                     forceRerankMode !== 'local' && isAPIRerankingConfigured());
-    
+
     if (useAPI) {
         return await rerankWithAPI(query, candidates, options);
     }
