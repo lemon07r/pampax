@@ -112,3 +112,7 @@ test/test-implementations/*
 
 .npmignore
 PUBLISHING.md
+
+AGENTS.md
+WARP.md
+CLAUDE.md

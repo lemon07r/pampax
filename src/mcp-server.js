@@ -1015,12 +1015,17 @@ server.tool(
         });
       }
 
+      const versionInfo = overviewResult.version
+        ? `🏷️  PAMPAX version: ${overviewResult.version}\n`
+        : "";
+
       return {
         content: [
           {
             type: "text",
             text:
               `📊 Project overview (${results.length} main functions):\n` +
+              versionInfo +
               `📁 Database: ${cleanPath}/.pampa/pampa.db\n\n${overview}`,
           },
         ],
