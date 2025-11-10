@@ -506,10 +506,13 @@ server.tool(
 
       const resultText = results.results
         .map((result, index) => {
+          const rerankerLine = typeof result.meta?.rerankerScore === 'number'
+            ? `\n   Reranker Score: ${result.meta.rerankerScore}`
+            : '';
           return (
             `${index + 1}. ${result.path}\n` +
             `   Symbol: ${result.meta.symbol} (${result.lang})\n` +
-            `   Similarity: ${result.meta.score}\n` +
+            `   Similarity: ${result.meta.score}${rerankerLine}\n` +
             `   SHA: ${result.sha}`
           );
         })
