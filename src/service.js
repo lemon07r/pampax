@@ -2811,19 +2811,15 @@ export async function searchCode(
 
     // ===== PHASE 6.5: FINAL SORT =====
     // Sort combinedResults by score to ensure proper ordering
-    // When reranker is active, sort by rerankerScore; otherwise by main score
+    // Use rerankerScore when available (from reranked results), otherwise use base score
     combinedResults.sort((a, b) => {
-      // If both have rerankerScore, use that (reranker overrides base score)
       const hasRerankerA = typeof a.meta?.rerankerScore === "number";
       const hasRerankerB = typeof b.meta?.rerankerScore === "number";
-
-      if (hasRerankerA && hasRerankerB) {
-        return b.meta.rerankerScore - a.meta.rerankerScore;
-      }
-
-      // Otherwise use the base score
-      const scoreA = a.meta?.score ?? 0;
-      const scoreB = b.meta?.score ?? 0;
+      
+      // Use rerankerScore if available for each item, otherwise fall back to base score
+      const scoreA = hasRerankerA ? a.meta.rerankerScore : (a.meta?.score ?? 0);
+      const scoreB = hasRerankerB ? b.meta.rerankerScore : (b.meta?.score ?? 0);
+      
       return scoreB - scoreA;
     });
 
