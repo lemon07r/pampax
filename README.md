@@ -918,6 +918,26 @@ PAMPAX can encrypt chunk bodies at rest using AES-256-GCM. Configure it like thi
 
 Existing plaintext archives remain readable, so you can enable encryption incrementally or rotate keys by re-indexing.
 
+## 🔧 Troubleshooting
+
+### MCP Error -32000: Connection Closed
+
+If you see this error after upgrading Node.js, the npx cache contains native modules compiled for your old Node.js version:
+
+```bash
+# Clear the npm/npx cache
+npm cache clean --force
+
+# Remove cached pampax (Linux/macOS)
+find ~/.npm/_npx -name "pampax" -type d -exec rm -rf {} + 2>/dev/null
+find ~/.cache -path "*_npx*" -name "pampax" -type d -exec rm -rf {} + 2>/dev/null
+
+# Then run pampax again
+npx -y pampax@latest mcp
+```
+
+For more troubleshooting tips, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
+
 ## 🤝 Contributing
 
 1. **Fork** → create feature branch (`feat/...`)

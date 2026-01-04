@@ -20,7 +20,59 @@ Este script verificará automáticamente:
 
 ## ❌ Problemas Comunes y Soluciones
 
-### 1. Error: "search_code se desconecta"
+### 1. Error: "MCP error -32000: Connection closed" (Node.js Version Mismatch)
+
+**Symptoms:**
+
+-   MCP server immediately disconnects with error code -32000
+-   Error message: "was compiled against a different Node.js version"
+-   Works in one folder but not others (when using npx)
+
+**Cause:**
+
+This happens when you upgrade your Node.js version. The native modules (tree-sitter, sqlite3) cached by npx were compiled for your old Node.js version and are incompatible with the new one.
+
+**Solutions:**
+
+#### A. Clear the npx cache (Recommended)
+
+```bash
+# Clear npm cache
+npm cache clean --force
+
+# Find and remove cached pampax installations
+# On Linux/macOS:
+find ~/.npm/_npx -name "pampax" -type d -exec rm -rf {} + 2>/dev/null
+find ~/.cache -path "*_npx*" -name "pampax" -type d -exec rm -rf {} + 2>/dev/null
+
+# On Windows (PowerShell):
+Remove-Item -Recurse -Force "$env:LOCALAPPDATA\npm-cache\_npx\*\node_modules\pampax" -ErrorAction SilentlyContinue
+
+# Then run pampax again - it will reinstall with correct binaries
+npx -y pampax@latest mcp
+```
+
+#### B. Use @latest tag to force fresh download
+
+Update your MCP configuration to use `@latest`:
+
+```json
+{
+  "command": ["npx", "-y", "pampax@latest", "mcp"]
+}
+```
+
+#### C. Check Node.js version compatibility
+
+```bash
+# PAMPAX requires Node.js 20.0.0 or higher
+node --version
+
+# If using Node.js 24+ or 25+, you may need to downgrade to Node.js 22 LTS
+# as some native modules don't support the newest Node.js versions yet
+```
+
+### 2. Error: "search_code se desconecta"
 
 **Síntomas:**
 
