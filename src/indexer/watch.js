@@ -6,15 +6,16 @@ import { getSupportedLanguageExtensions } from '../service.js';
 import { createEmbeddingProvider } from '../providers.js';
 
 const DEFAULT_DEBOUNCE_MS = 500;
-const IGNORED_GLOBS = [
-    '**/node_modules/**',
-    '**/.git/**',
-    '**/.pampa/**',
-    '**/dist/**',
-    '**/build/**',
-    '**/tmp/**',
-    '**/.tmp/**',
-    '**/vendor/**'
+const IGNORED_DIRS = [
+    'node_modules',
+    '.git',
+    '.pampa',
+    '.pampax',
+    'dist',
+    'build',
+    'tmp',
+    '.tmp',
+    'vendor'
 ];
 
 export function startWatch({
@@ -29,18 +30,34 @@ export function startWatch({
     const supportedExtensions = new Set(
         (getSupportedLanguageExtensions() || []).map(ext => ext.toLowerCase())
     );
-    const watchPatterns = supportedExtensions.size > 0
-        ? Array.from(supportedExtensions).map(ext => `**/*${ext}`)
-        : ['**/*'];
 
     const effectiveDebounce = Number.isFinite(Number.parseInt(debounceMs, 10))
         ? Math.max(Number.parseInt(debounceMs, 10), 50)
         : DEFAULT_DEBOUNCE_MS;
 
-    const watcher = chokidar.watch(watchPatterns, {
-        cwd: root,
+    // Chokidar 5.x removed glob support - use ignored function instead
+    // Only ignore directories here, extension filtering happens in recordChange
+    const ignoredFn = (filePath) => {
+        // Get relative path from root to check only project-relative directories
+        const relativePath = path.relative(root, filePath);
+        if (!relativePath) {
+            // This is the root itself, don't ignore
+            return false;
+        }
+        
+        // Check if relative path contains any ignored directory
+        const pathParts = relativePath.split(path.sep);
+        for (const dir of IGNORED_DIRS) {
+            if (pathParts.includes(dir)) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    const watcher = chokidar.watch(root, {
         ignoreInitial: true,
-        ignored: IGNORED_GLOBS,
+        ignored: ignoredFn,
         awaitWriteFinish: {
             stabilityThreshold: Math.max(effectiveDebounce, 100),
             pollInterval: 50
@@ -96,7 +113,9 @@ export function startWatch({
     }
 
     function recordChange(type, filePath) {
-        const normalized = toPosixPath(filePath);
+        // Convert absolute path to relative path from root
+        const relativePath = path.relative(root, filePath);
+        const normalized = toPosixPath(relativePath);
         if (!normalized) {
             return;
         }

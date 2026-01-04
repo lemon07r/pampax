@@ -103,16 +103,16 @@ if (!sqliteAvailable) {
             await controller.ready;
 
             // Wait a bit to ensure watcher is fully ready
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 200));
 
             await fs.writeFile(fileA, 'export function alpha() {\n  return 42;\n}\n');
 
             // Wait for file system events to be processed
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 200));
             await controller.flush();
 
             // Give more time for processing
-            await new Promise(resolve => setTimeout(resolve, 300));
+            await new Promise(resolve => setTimeout(resolve, 500));
 
             // Check if we got any batches or embeddings
             const hasEmbeddings = counter.count > 0;
