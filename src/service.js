@@ -725,11 +725,13 @@ let globalContext = {
 
 const bm25IndexCache = new Map();
 const chunkTextCache = new Map();
+const embeddingCache = new Map();
 
 const envRerankMax = Number.parseInt(
   process.env.PAMPAX_RERANKER_MAX || "50",
   10,
 );
+
 const RERANKER_MAX_CANDIDATES =
   Number.isFinite(envRerankMax) && envRerankMax > 0 ? envRerankMax : 50;
 const RERANKER_SCORE_HINT_REGEX = /mockScore:([+-]?\d+(?:\.\d+)?)/i;
@@ -740,8 +742,10 @@ export function setBasePath(basePath = ".") {
   if (globalContext.basePath && globalContext.basePath !== resolvedPath) {
     bm25IndexCache.clear();
     chunkTextCache.clear();
+    embeddingCache.clear();
   }
   globalContext.basePath = resolvedPath;
+
   globalContext.chunkDir = path.join(resolvedPath, ".pampa/chunks");
   globalContext.codemap = path.join(resolvedPath, "pampa.codemap.json");
   globalContext.dbPath = path.join(resolvedPath, ".pampa/pampa.db");
@@ -865,12 +869,25 @@ function ensureBm25IndexForChunks(providerName, dimensions, chunks) {
   const entry = getOrCreateBm25Entry(providerName, dimensions);
   const toAdd = [];
 
+  // Optimization: If we have many chunks, we avoid reading all of them from disk
+  // during the first search to prevent timeouts. Metadata is usually enough.
+  const isLargeProject = chunks.length > 1000;
+
   for (const chunk of chunks) {
     if (!chunk || !chunk.id || entry.added.has(chunk.id)) {
       continue;
     }
 
-    const codeText = readChunkTextCached(chunk.sha);
+    // Only read from disk if it's already cached or if it's a small project
+    // This avoids hitting the disk thousands of times on the first search
+    let codeText = null;
+    const cacheKey = getChunkCacheKey(chunk.sha);
+    if (chunkTextCache.has(cacheKey)) {
+      codeText = chunkTextCache.get(cacheKey);
+    } else if (!isLargeProject) {
+      codeText = readChunkTextCached(chunk.sha);
+    }
+
     const docText = buildBm25Document(chunk, codeText);
 
     if (docText && docText.trim().length > 0) {
@@ -879,6 +896,7 @@ function ensureBm25IndexForChunks(providerName, dimensions, chunks) {
 
     entry.added.add(chunk.id);
   }
+
 
   if (toAdd.length > 0) {
     entry.index.addDocuments(toAdd);
@@ -898,7 +916,9 @@ export function clearBasePath() {
   };
   bm25IndexCache.clear();
   chunkTextCache.clear();
+  embeddingCache.clear();
 }
+
 
 // ============================================================================
 // DATABASE UTILITIES
@@ -2495,60 +2515,75 @@ export async function searchCode(
     const all = promisify(db.all.bind(db));
 
     // Enhanced search query to include semantic metadata
-    const chunks = await all(
-      `
-            SELECT id, file_path, symbol, sha, lang, chunk_type, embedding,
-                   pampa_tags, pampa_intent, pampa_description,
-                   embedding_provider, embedding_dimensions
-            FROM code_chunks
-            WHERE embedding_provider = ? AND embedding_dimensions = ?
-            ORDER BY created_at DESC
-        `,
-      [embeddingProvider.getName(), embeddingProvider.getDimensions()],
-    );
+  const chunks = await all(
+    `
+          SELECT id, file_path, symbol, sha, lang, chunk_type, embedding,
+                 pampa_tags, pampa_intent, pampa_description,
+                 embedding_provider, embedding_dimensions
+          FROM code_chunks
+          WHERE embedding_provider = ? AND embedding_dimensions = ?
+          ORDER BY created_at DESC
+      `,
+    [embeddingProvider.getName(), embeddingProvider.getDimensions()],
+  );
 
-    db.close();
+  db.close();
 
-    const codemapData = readCodemap(codemapPath);
+  const codemapData = readCodemap(codemapPath);
 
-    if (chunks.length === 0) {
-      return {
-        success: false,
-        error: "no_chunks_found",
-        message: `No indexed chunks found with ${embeddingProvider.getName()} in ${path.resolve(workingPath)}`,
-        suggestion: `Run: npx pampa index --provider ${effectiveProvider} from ${path.resolve(workingPath)}`,
-        provider: embeddingProvider.getName(),
-        scope: normalizedScope,
-        hybrid: { enabled: hybridEnabled, bm25Enabled },
-        reranker: normalizedScope.reranker,
-        results: [],
-      };
+
+  if (chunks.length === 0) {
+    return {
+      success: false,
+      error: "no_chunks_found",
+      message: `No indexed chunks found with ${embeddingProvider.getName()} in ${path.resolve(workingPath)}`,
+      suggestion: `Run: npx pampa index --provider ${effectiveProvider} from ${path.resolve(workingPath)}`,
+      provider: embeddingProvider.getName(),
+      scope: normalizedScope,
+      hybrid: { enabled: hybridEnabled, bm25Enabled },
+      symbolBoost: { enabled: symbolBoostEnabled, boosted: false },
+      reranker: normalizedScope.reranker,
+      results: [],
+    };
+  }
+
+  const scopedChunks = applyScope(chunks, normalizedScope);
+  const scopedShaSet = new Set(scopedChunks.map((chunk) => chunk.sha));
+  const chunkIdBySha = new Map();
+  const scopedIntentionResults = hasScopeFilters(normalizedScope)
+    ? intentionResults.filter((result) => scopedShaSet.has(result.sha))
+    : intentionResults;
+
+  // ===== PHASE 4: ENHANCED SIMILARITY CALCULATION =====
+  const chunkInfoById = new Map();
+  const results = [];
+
+  let queryEmbedding = null;
+  if (scopedChunks.length > 0) {
+    queryEmbedding = await embeddingProvider.generateEmbedding(query);
+  }
+
+  for (const chunk of scopedChunks) {
+    // Optimization: Cache parsed embeddings to avoid repeated JSON.parse
+    let embedding = embeddingCache.get(chunk.sha);
+    if (!embedding) {
+      try {
+        embedding = JSON.parse(chunk.embedding.toString());
+        embeddingCache.set(chunk.sha, embedding);
+      } catch (error) {
+        embedding = null;
+      }
     }
 
-    const scopedChunks = applyScope(chunks, normalizedScope);
-    const scopedShaSet = new Set(scopedChunks.map((chunk) => chunk.sha));
-    const chunkIdBySha = new Map();
-    const scopedIntentionResults = hasScopeFilters(normalizedScope)
-      ? intentionResults.filter((result) => scopedShaSet.has(result.sha))
-      : intentionResults;
+    const vectorSimilarity = queryEmbedding && embedding
+      ? cosineSimilarity(queryEmbedding, embedding)
+      : 0;
 
-    // ===== PHASE 4: ENHANCED SIMILARITY CALCULATION =====
-    const chunkInfoById = new Map();
-    const results = [];
 
-    let queryEmbedding = null;
-    if (scopedChunks.length > 0) {
-      queryEmbedding = await embeddingProvider.generateEmbedding(query);
-    }
 
-    for (const chunk of scopedChunks) {
-      const embedding = JSON.parse(chunk.embedding.toString());
-      const vectorSimilarity = queryEmbedding
-        ? cosineSimilarity(queryEmbedding, embedding)
-        : 0;
+    // Boost score based on semantic metadata
+    let boostScore = 0;
 
-      // Boost score based on semantic metadata
-      let boostScore = 0;
 
       // Boost if query matches pampa intent
       if (
@@ -2638,6 +2673,8 @@ export async function searchCode(
         if (bm25Index) {
           const allowedIds = new Set(scopedChunks.map((chunk) => chunk.id));
           const bm25RawResults = bm25Index.search(query, selectionBudget);
+
+
           const bm25Results = bm25RawResults.filter(
             (result) =>
               allowedIds.has(result.id) && !intentionChunkIds.has(result.id),
